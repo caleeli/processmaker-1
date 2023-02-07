@@ -57,6 +57,7 @@
         "bootstrap": "^4.5.3",
         "bootstrap-vue": "^2.18.1",
         "bpmn-font": "^0.10.0",
+        "bpmn-js": "^11.1.1",
         "bpmn-moddle": "^6.0.2",
         "chart.js": "^2.9.4",
         "country-json": "^1.1.0",

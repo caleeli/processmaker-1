@@ -118,6 +118,7 @@ Route::middleware('auth:api', 'setlocale', 'bindings', 'sanitize')->prefix('api/
     Route::delete('processes/{process}', [ProcessController::class, 'destroy'])->name('processes.destroy')->middleware('can:archive-processes');
     Route::put('processes/{processId}/restore', [ProcessController::class, 'restore'])->name('processes.restore')->middleware('can:archive-processes');
     Route::post('process_events/{process}', [ProcessController::class, 'triggerStartEvent'])->name('process_events.trigger')->middleware('can:start,process');
+    Route::post('processes/suggested-diagrams', 'ProcessController@suggestedDiagrams')->name('processes.suggestedDiagrams')->middleware('can:create-processes');
 
     // List of Processes that the user can start
     Route::get('start_processes', [ProcessController::class, 'startProcesses'])->name('processes.start'); //Filtered in controller

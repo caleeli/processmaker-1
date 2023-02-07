@@ -1198,4 +1198,105 @@ class ProcessController extends Controller
             $node->setAttributeNS(WorkflowServiceProvider::PROCESS_MAKER_NS, 'config', json_encode($config));
         }
     }
+
+    public function suggestedDiagrams()
+    {
+        /*return [
+            'options' => [
+                '
+                startEvent("Start Registration", "Student");
+                userTask("Fill Course Form", "Student", ["courseId", "studentId"]);
+                scriptTask("Validate Course Form", "System");
+                serviceTask("Save Course Form", "System", "http://course-service.com/save", "POST");
+                userTask("Approve/Reject Registration", "Coordinator", ["approval"]);
+                ifVariable("approval", [
+                  { value: true, cb: () => {
+                      serviceTask("Send Confirmation Email", "System", "http://mail-service.com/send", "POST");
+                      endEvent("End Registration", "Student");
+                  }},
+                  { value: false, cb: () => {
+                      serviceTask("Send Rejection Email", "System", "http://mail-service.com/send", "POST");
+                      exitProcess("Exit Registration", "Student");
+                  }}
+                ]);
+                saveProcess();',
+                '
+                startEvent("Start Registration", "Student");
+                userTask("Fill Course Form", "Student", ["courseId", "studentId"]);
+                scriptTask("Validate Course Form", "System");
+                serviceTask("Save Course Form", "System", "http://course-service.com/save", "POST");
+                userTask("Approve/Reject Registration", "Coordinator", ["approval"]);
+                ifVariable("approval", [
+                  { value: true, cb: () => {
+                      serviceTask("Send Confirmation Email", "System", "http://mail-service.com/send", "POST");
+                      endEvent("End Registration", "Student");
+                  }},
+                  { value: false, cb: () => {
+                      serviceTask("Send Rejection Email", "System", "http://mail-service.com/send", "POST");
+                      exitProcess("Exit Registration", "Student");
+                  }}
+                ]);
+                saveProcess();',                
+            ]
+        ];*/
+        $description = request()->input('description');
+
+        $curl = curl_init();
+
+        $prompt = $this->convertToPrompt($description);
+
+        $body = [
+            'model' => 'text-davinci-003',
+            'prompt' => $prompt,
+            'max_tokens' => 1256,
+            'temperature' => 0.5,
+            'top_p' => 1,
+            'n' => 3,
+            'frequency_penalty' => 0,
+            'presence_penalty' => 0,
+            'stop' => ["// END."]
+        ];
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => 'https://api.openai.com/v1/completions',
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS => json_encode($body),
+          CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . env('OPENAI_TOKEN'),
+          ),
+        ));
+        
+        $response = curl_exec($curl);
+        \Log::debug($response);
+        $response = json_decode($response);
+        curl_close($curl);
+
+        if (isset($response->error)) {
+            return ["error" => "The AI server is currently unavailable. Please try again later."];
+        }
+        if (isset($response->choices)) {
+            $options = [];
+            foreach ($response->choices as $choice) {
+                $options[] = $choice->text;// . "saveProcess();";
+            }
+            return ['options' => $options];
+        }
+        return ["error" => "The AI server is currently unavailable. Please try again later."];
+    }
+
+    private function convertToPrompt($description)
+    {
+        // load pre code from file
+        $code = file_get_contents(resource_path('ai/createProcess.ts'));
+        // replace mustache with description
+        $code = str_replace('{{description}}', $description, $code);
+        // return code
+        return $code;
+    }
 }

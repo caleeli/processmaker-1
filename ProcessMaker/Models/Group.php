@@ -121,6 +121,24 @@ class Group extends ProcessMakerModel
         })->sortBy('id')->values();
     }
 
+    public static function getRecursiveUserIds($groupId)
+    {
+        $users = collect();
+        $group = self::find($groupId);
+
+        $users = $users->merge($group->users->pluck('id'));
+
+        $group->groupMembers->select(['member_id', 'member_type'])->where('member_type', self::class)->each(function ($member) use (&$users, $groupId) {
+            if ($member['member_id'] != $groupId) {
+                $users = $users->merge(self::getRecursiveUserIds($groupId));
+            }
+        });
+
+        return $users->unique()->sortBy(function ($a, $b) {
+            return $a > $b;
+        });
+    }
+
     /**
      * Scope to only return active groups.
      *
