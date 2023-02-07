@@ -90,6 +90,7 @@
         {{ $t('Suggested diagrams') }}
       </b-button>
     </b-modal>
+    <!-- Modal with 3 buttons MORE, CANCEL, OK -->
     <b-modal
       id="suggestProcess"
       ref="suggestProcess"
@@ -97,17 +98,54 @@
       size="lg"
       :title="$t('Suggested process')"
     >
-      <div
-        v-for="(suggest, index) in suggestedDiagrams"
-        :key="`suggest-${index}`"
-        :style="`width: ${suggest.width}px; height: ${suggest.height}px;`"
-        v-html="suggest.diagram"
-      />
-      <div
-        ref="bpmn_canvas"
-        class="suggest-diagram"
-        style="visibility: hidden;"
-      />
+      <div class="suggested-options">
+        <div
+          v-for="(suggest, index) in suggestedDiagramsCursor"
+          :key="`suggest-${index}`"
+          class="suggest-option"
+        >
+          <div
+            :style="`width: ${suggest.width}px; height: ${suggest.height}px;`"
+            v-html="suggest.diagram"
+          />
+        </div>
+        <div
+          v-if="loadingSuggestions"
+          class="suggest-option-empty"
+        >
+          <div
+            class="spinner-border text-primary"
+            role="status"
+          >
+            <span class="sr-only">Loading suggestions...</span>
+          </div>
+        </div>
+        <div
+          ref="bpmn_canvas"
+          class="suggest-diagram"
+          style="visibility: hidden;"
+        />
+      </div>
+      <template v-slot:modal-footer>
+        <b-button
+          variant="primary"
+          @click="onSuggestOk"
+        >
+          {{ $t('Ok') }}
+        </b-button>
+        <b-button
+          variant="secondary"
+          @click="onSuggestCancel"
+        >
+          {{ $t('Cancel') }}
+        </b-button>
+        <b-button
+          variant="secondary"
+          @click="onSuggestMore"
+        >
+          {{ $t('More') }}
+        </b-button>
+      </template>
     </b-modal>
   </div>
 </template>
@@ -123,8 +161,9 @@ export default {
   props: ["countCategories"],
   data() {
     return {
+      loadingSuggestions: false,
       selectedSuggest: null,
-      suggestedDiagrams: ["", "", ""],
+      suggestedDiagrams: [],
       showModal: false,
       name: "",
       selectedFile: "",
@@ -137,50 +176,105 @@ export default {
       disabled: false,
     };
   },
+  computed: {
+    suggestedDiagramsCursor() {
+      if (this.loadingSuggestions) {
+        // get last 3 items
+        return this.suggestedDiagrams.slice(-3);
+      }
+      // get last 4 items
+      return this.suggestedDiagrams.slice(-4);
+    },
+  },
   methods: {
+    onSuggestOk() {
+      this.$refs.suggestProcess.hide();
+      this.$refs.addProcess.hide();
+      this.$emit("suggest-ok", this.selectedSuggest);
+    },
+    onSuggestCancel() {
+      this.$refs.suggestProcess.hide();
+    },
+    onSuggestMore() {
+      this.loadingSuggestions = true;
+      this.$nextTick(() => {
+        this.$refs.suggestProcess.hide();
+        this.$refs.addProcess.show();
+      });
+    },
+    parseDiagrams(response) {
+      // this.suggestedDiagrams = response.data;
+      if (response.data.error) {
+        // eslint-disable-next-line no-console
+        console.error(response.data.error);
+      } else if (response.data.options) {
+        //this.$nextTick(() => {
+        response.data.options.forEach(async (code) => {
+          const foundIndex = this.suggestedDiagrams.findIndex((d) => d.code === code);
+          if (foundIndex > -1) {
+            // // move to the end
+            // this.suggestedDiagrams.push(this.suggestedDiagrams[foundIndex]);
+            // this.suggestedDiagrams.splice(foundIndex, 1);
+            return;
+          }
+          const { bpmn, width, height } = createProcessAI(code);
+          if (!bpmn) {
+            return;
+          }
+          console.log([bpmn]);
+          this.$refs.bpmn_canvas.innerHTML = "";
+          const viewer = new BpmnViewer({
+            container: this.$refs.bpmn_canvas,
+            width,
+            height,
+          });
+          await viewer.importXML(bpmn);
+          await viewer.get("canvas").zoom("fit-viewport");
+          // eslint-disable-next-line no-underscore-dangle
+          const svg = viewer.get("canvas")._svg.outerHTML;
+          this.suggestedDiagrams.push({
+            code,
+            diagram: svg,
+            bpmn,
+            width,
+            height,
+          });
+          //});
+        });
+      }
+    },
     // call api, avoid timeout
-    generateSuggestedDiagrams() {
+    async generateSuggestedDiagrams() {
       this.$refs.suggestProcess.show();
-      ProcessMaker.apiClient.post("processes/suggested-diagrams", {
+      this.suggestedDiagrams.splice(0, this.suggestedDiagrams.length);
+      this.loadingSuggestions = true;
+      const awaitDiagrams = [];
+      awaitDiagrams.push(ProcessMaker.apiClient.post("processes/cache-suggested-diagrams", {
         name: this.name,
         description: this.description,
       }, {
         timeout: 120000,
       })
         .then(async (response) => {
-          // this.suggestedDiagrams = response.data;
-          if (response.data.error) {
-            // eslint-disable-next-line no-console
-            console.error(response.data.error);
-          } else if (response.data.options) {
-            this.suggestedDiagrams.splice(0, this.suggestedDiagrams.length);
-            this.$nextTick(() => {
-              response.data.options.forEach(async (code) => {
-                const { bpmn, width, height } = createProcessAI(code);
-                console.log([bpmn]);
-                this.$refs.bpmn_canvas.innerHTML = "";
-                const viewer = new BpmnViewer({
-                  container: this.$refs.bpmn_canvas,
-                  width,
-                  height,
-                });
-                await viewer.importXML(bpmn);
-                await viewer.get("canvas").zoom("fit-viewport");
-                // eslint-disable-next-line no-underscore-dangle
-                const svg = viewer.get("canvas")._svg.outerHTML;
-                this.suggestedDiagrams.push({
-                  diagram: svg,
-                  bpmn,
-                  width,
-                  height,
-                });
-              });
-            });
-          }
+          this.parseDiagrams(response);
         })
         .catch((error) => {
           console.log(error);
-        });
+        }));
+      awaitDiagrams.push(ProcessMaker.apiClient.post("processes/suggested-diagrams", {
+        name: this.name,
+        description: this.description,
+      }, {
+        timeout: 360000,
+      })
+        .then(async (response) => {
+          this.parseDiagrams(response);
+        })
+        .catch((error) => {
+          console.log(error);
+        }));
+      await Promise.all(awaitDiagrams);
+      this.loadingSuggestions = false;
     },
     browse() {
       this.$refs.customFile.click();
@@ -275,5 +369,38 @@ export default {
 }
 .suggest-process-modal.modal .modal-body {
   overflow-y: auto;
+}
+.suggested-options {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.suggest-option {
+  width: calc(50% - 2rem);
+  height: calc(50% - 2rem);
+  overflow: auto;
+  margin: 1rem;
+  border: 1px solid black;
+  /* center content */
+  /*display: flex;
+  justify-content: center;
+  align-items: center;*/
+}
+.suggest-option:hover {
+  /* primary color shadow */
+  box-shadow: 0 0 0 4px #007bff;
+}
+.suggest-option-empty {
+  width: calc(50% - 2rem);
+  height: calc(50% - 2rem);
+  overflow: hidden;
+  margin: 1rem;
+  /* center content */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
