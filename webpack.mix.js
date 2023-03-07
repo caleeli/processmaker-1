@@ -105,9 +105,14 @@ mix.js("resources/js/app-layout.js", "public/js")
 
   .js("resources/js/notifications/index.js", "public/js/notifications/index.js")
 
+  // AI extra files
+  .js("resources/js/processes/ai.js", "public/js/processes")
+
   // Note, that this should go last for the extract to properly put the manifest and vendor in the right location
   // See: https://github.com/JeffreyWay/laravel-mix/issues/1118
   .js("resources/js/app.js", "public/js");
+
+
 
 // Monaco AMD modules. Copy only the files we need to make the build faster.
 const monacoSource = 'node_modules/monaco-editor/min/vs/';
