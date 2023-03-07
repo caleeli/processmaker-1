@@ -27,6 +27,7 @@ use ProcessMaker\Http\Controllers\Api\TaskAssignmentController;
 use ProcessMaker\Http\Controllers\Api\TaskController;
 use ProcessMaker\Http\Controllers\Api\UserController;
 use ProcessMaker\Http\Controllers\Api\UserTokenController;
+use ProcessMaker\Http\Controllers\ScreenMakerController;
 use ProcessMaker\Http\Controllers\TestStatusController;
 
 Route::middleware('auth:api', 'setlocale', 'bindings', 'sanitize')->prefix('api/1.0')->name('api.')->group(function () {
@@ -118,7 +119,8 @@ Route::middleware('auth:api', 'setlocale', 'bindings', 'sanitize')->prefix('api/
     Route::delete('processes/{process}', [ProcessController::class, 'destroy'])->name('processes.destroy')->middleware('can:archive-processes');
     Route::put('processes/{processId}/restore', [ProcessController::class, 'restore'])->name('processes.restore')->middleware('can:archive-processes');
     Route::post('process_events/{process}', [ProcessController::class, 'triggerStartEvent'])->name('process_events.trigger')->middleware('can:start,process');
-    Route::post('processes/suggested-diagrams', 'ProcessController@suggestedDiagrams')->name('processes.suggestedDiagrams')->middleware('can:create-processes');
+    Route::post('processes/suggested-diagrams', [ProcessController::class, 'suggestedDiagrams'])->name('processes.suggestedDiagrams')->middleware('can:create-processes');
+    Route::post('processes/cached-suggested-diagrams', [ProcessController::class, 'cachedSuggestedDiagrams'])->name('processes.cachedSuggestedDiagrams')->middleware('can:create-processes');
 
     // List of Processes that the user can start
     Route::get('start_processes', [ProcessController::class, 'startProcesses'])->name('processes.start'); //Filtered in controller
@@ -226,4 +228,7 @@ Route::middleware('auth:api', 'setlocale', 'bindings', 'sanitize')->prefix('api/
     })->name('fallback');
 
     Route::get('/test_acknowledgement', [TestStatusController::class, 'testAcknowledgement'])->name('test.acknowledgement');
+
+    Route::post('/ai-maker/test/{model}', [ScreenMakerController::class, 'test'])->name('screen_maker.test');
+    Route::post('/ai-maker/resource/{model}/{id}', [ScreenMakerController::class, 'resource_get'])->name('screen_maker.resource_get');
 });

@@ -85,7 +85,7 @@
         variant="primary"
         class="mb-3"
         :disabled="!description.trim()"
-        @click="generateSuggestedDiagrams"
+        @click="openSuggestedDiagrams"
       >
         {{ $t('Suggested diagrams') }}
       </b-button>
@@ -98,13 +98,18 @@
       size="lg"
       :title="$t('Suggested process')"
     >
-      <div class="suggested-options">
+      <div
+        v-if="!selectedSuggest"
+        class="suggested-options"
+      >
         <div
           v-for="(suggest, index) in suggestedDiagramsCursor"
           :key="`suggest-${index}`"
           class="suggest-option"
+          @click="onSuggestSelect(suggest)"
         >
           <div
+            class="suggest-diagram"
             :style="`width: ${suggest.width}px; height: ${suggest.height}px;`"
             v-html="suggest.diagram"
           />
@@ -120,32 +125,58 @@
             <span class="sr-only">Loading suggestions...</span>
           </div>
         </div>
+      </div>
+      <div
+        v-else
+        class="suggest-selected"
+      >
         <div
+          class="suggest-diagram"
+          :style="`width: ${selectedSuggest.width}px; height: ${selectedSuggest.height}px;`"
+          v-html="selectedSuggest.diagram"
+        />
+      </div>
+      <template v-slot:modal-footer>
+        <template v-if="!selectedSuggest">
+          <b-button
+            variant="secondary"
+            @click="onSuggestMore"
+          >
+            {{ $t('More options') }}
+          </b-button>
+          <b-button
+            variant="secondary"
+            @click="onSuggestCancel"
+          >
+            {{ $t('Cancel') }}
+          </b-button>
+        </template>
+        <template v-else>
+          <b-button
+            variant="secondary"
+            @click="copyCodeToClipboard"
+          >
+            {{ $t('Add as example') }}
+          </b-button>
+          <b-button
+            variant="secondary"
+            @click="onSuggestBack"
+          >
+            {{ $t('Back') }}
+          </b-button>
+          <b-button
+            variant="primary"
+            @click="onSuggestOk"
+          >
+            {{ $t('Select') }}
+          </b-button>
+        </template>
+      </template>
+      <div
           ref="bpmn_canvas"
           class="suggest-diagram"
           style="visibility: hidden;"
         />
-      </div>
-      <template v-slot:modal-footer>
-        <b-button
-          variant="primary"
-          @click="onSuggestOk"
-        >
-          {{ $t('Ok') }}
-        </b-button>
-        <b-button
-          variant="secondary"
-          @click="onSuggestCancel"
-        >
-          {{ $t('Cancel') }}
-        </b-button>
-        <b-button
-          variant="secondary"
-          @click="onSuggestMore"
-        >
-          {{ $t('More') }}
-        </b-button>
-      </template>
     </b-modal>
   </div>
 </template>
@@ -187,6 +218,39 @@ export default {
     },
   },
   methods: {
+    copyToClipboard(textToCopy) {
+      // navigator clipboard api needs a secure context (https)
+      if (navigator.clipboard && window.isSecureContext) {
+        // navigator clipboard api method'
+        return navigator.clipboard.writeText(textToCopy);
+      } else {
+        // text area method
+        let textArea = document.createElement("textarea");
+        textArea.value = textToCopy;
+        // make the textarea out of viewport
+        textArea.style.position = "fixed";
+        textArea.style.left = "-999999px";
+        textArea.style.top = "-999999px";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        return new Promise((res, rej) => {
+          // here the magic happens
+          document.execCommand('copy') ? res() : rej();
+          textArea.remove();
+        });
+      }
+    },
+    copyCodeToClipboard() {
+      this.copyToClipboard(this.selectedSuggest.code);
+      console.log(this.selectedSuggest.code);
+    },
+    onSuggestBack() {
+      this.selectedSuggest = null;
+    },
+    onSuggestSelect(suggest) {
+      this.selectedSuggest = suggest;
+    },
     onSuggestOk() {
       this.$refs.suggestProcess.hide();
       this.$refs.addProcess.hide();
@@ -196,11 +260,12 @@ export default {
       this.$refs.suggestProcess.hide();
     },
     onSuggestMore() {
-      this.loadingSuggestions = true;
-      this.$nextTick(() => {
-        this.$refs.suggestProcess.hide();
-        this.$refs.addProcess.show();
-      });
+      this.generateSuggestedDiagrams(false);
+    },
+    openSuggestedDiagrams() {
+      this.$refs.suggestProcess.show();
+      this.suggestedDiagrams.splice(0, this.suggestedDiagrams.length);
+      this.generateSuggestedDiagrams(true);
     },
     parseDiagrams(response) {
       // this.suggestedDiagrams = response.data;
@@ -221,7 +286,6 @@ export default {
           if (!bpmn) {
             return;
           }
-          console.log([bpmn]);
           this.$refs.bpmn_canvas.innerHTML = "";
           const viewer = new BpmnViewer({
             container: this.$refs.bpmn_canvas,
@@ -244,23 +308,23 @@ export default {
       }
     },
     // call api, avoid timeout
-    async generateSuggestedDiagrams() {
-      this.$refs.suggestProcess.show();
-      this.suggestedDiagrams.splice(0, this.suggestedDiagrams.length);
+    async generateSuggestedDiagrams(includeCache) {
       this.loadingSuggestions = true;
       const awaitDiagrams = [];
-      awaitDiagrams.push(ProcessMaker.apiClient.post("processes/cache-suggested-diagrams", {
-        name: this.name,
-        description: this.description,
-      }, {
-        timeout: 120000,
-      })
-        .then(async (response) => {
-          this.parseDiagrams(response);
+      if (includeCache) {
+        awaitDiagrams.push(ProcessMaker.apiClient.post("processes/cached-suggested-diagrams", {
+          name: this.name,
+          description: this.description,
+        }, {
+          timeout: 120000,
         })
-        .catch((error) => {
-          console.log(error);
-        }));
+          .then(async (response) => {
+            this.parseDiagrams(response);
+          })
+          .catch((error) => {
+            console.log(error);
+          }));
+      }
       awaitDiagrams.push(ProcessMaker.apiClient.post("processes/suggested-diagrams", {
         name: this.name,
         description: this.description,
@@ -346,10 +410,6 @@ export default {
 </script>
 
 <style>
-.suggest-diagram {
-  pointer-events: none;
-  width: calc(100% - 5rem);
-}
 .suggest-diagram .bjs-powered-by {
   display: none;
 }
@@ -382,6 +442,7 @@ export default {
   width: calc(50% - 2rem);
   height: calc(50% - 2rem);
   overflow: auto;
+  cursor: grab;
   margin: 1rem;
   border: 1px solid black;
   /* center content */
@@ -402,5 +463,16 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+.suggest-diagram svg {
+  pointer-events: none;
+}
+.suggest-selected {
+  width: calc(100% - 2rem);
+  height: calc(100% - 2rem);
+  overflow: auto;
+  margin: 1rem;
+  border: 1px solid black;
+  box-shadow: 0 0 0 4px #007bff;
 }
 </style>

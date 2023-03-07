@@ -17,6 +17,7 @@ export default function createProcessAI(code) {
   let participantShape;
   let participantBounds;
   const lanes = [];
+  const elementsIndex = [];
   let inc = 0;
   function autoInc() {
     inc += 1;
@@ -77,6 +78,14 @@ export default function createProcessAI(code) {
     const role = elementItem ? elementItem.role : "";
     return role;
   }
+  function checkId(idOrName) {
+    let element = bpmn.getElementById(idOrName);
+    if (!element) {
+      const elementId = elementsIndex.find((item) => item.name === idOrName).id;
+      element = bpmn.getElementById(elementId);
+    }
+    return element.getAttribute("id");
+  }
   function connectWithCondition(source, target, condition = "", isGoBack = false) {
     const targetElement = bpmn.getElementById(target);
     const sourceElement = bpmn.getElementById(source);
@@ -114,7 +123,8 @@ export default function createProcessAI(code) {
       isGoBack,
     });
   }
-  function addToLane(id, role, item, previousElements = null) {
+  function addToLane(id, name, role, item, previousElements = null) {
+    elementsIndex.push({ id, name, role, bounds: item });
     const lane = findOrCreateLane(role);
     const itemAdded = {
       id, role, row: lane.currentRow, col: currentCol, item,
@@ -161,7 +171,7 @@ export default function createProcessAI(code) {
     bounds.setAttribute("height", String(height));
     startEventShape.appendChild(bounds);
     plane.appendChild(startEventShape);
-    addToLane(id, role, bounds);
+    addToLane(id, name, role, bounds);
     return id;
   }
   // display a screen to a role so he can do an action, or select an option
@@ -183,7 +193,7 @@ export default function createProcessAI(code) {
     bounds.setAttribute("height", String(height));
     userTaskShape.appendChild(bounds);
     plane.appendChild(userTaskShape);
-    addToLane(id, role, bounds);
+    addToLane(id, name, role, bounds);
     return id;
   }
   function scriptTask(name) {
@@ -205,7 +215,7 @@ export default function createProcessAI(code) {
     bounds.setAttribute("height", String(height));
     scriptTaskShape.appendChild(bounds);
     plane.appendChild(scriptTaskShape);
-    addToLane(id, role, bounds);
+    addToLane(id, name, role, bounds);
     return id;
   }
   function serviceTask(name, url, method) {
@@ -228,7 +238,7 @@ export default function createProcessAI(code) {
     bounds.setAttribute("height", String(height));
     serviceTaskShape.appendChild(bounds);
     plane.appendChild(serviceTaskShape);
-    addToLane(id, role, bounds);
+    addToLane(id, name, role, bounds);
     return id;
   }
   function endEvent(name, killAllThreads = false) {
@@ -256,7 +266,7 @@ export default function createProcessAI(code) {
       process.appendChild(endEventNode);
     }
     plane.appendChild(endEventShape);
-    addToLane(id, role, bounds);
+    addToLane(id, name, role, bounds);
     return id;
   }
   function exitProcess(name) {
@@ -281,7 +291,7 @@ export default function createProcessAI(code) {
     bounds.setAttribute("height", String(height));
     endEventShape.appendChild(bounds);
     plane.appendChild(endEventShape);
-    addToLane(id, role, bounds);
+    addToLane(id, name, role, bounds);
     return id;
   }
   function waitAnyOneOf(callback) {
@@ -309,7 +319,7 @@ export default function createProcessAI(code) {
     bounds.setAttribute("height", String(height));
     exclusiveGatewayShape.appendChild(bounds);
     plane.appendChild(exclusiveGatewayShape);
-    addToLane(id, role, bounds, previousElements);
+    addToLane(id, name, role, bounds, previousElements);
     return id;
   }
   function goBack(id) {
@@ -348,7 +358,7 @@ export default function createProcessAI(code) {
       }
       cb();
       if (goBackTo) {
-        goBack(goBackTo);
+        goBack(checkId(goBackTo));
       }
       // check if previousElement is not an endEvent
       if (previousElement) {
@@ -537,6 +547,26 @@ export default function createProcessAI(code) {
     plane.appendChild(participantShape);
   }
   initProcess();
+  // Create a Proxy to catch all calls to the engine
+  const engine = new Proxy(
+    {
+      startEvent: startEvent,
+      endEvent: endEvent,
+      userTask: userTask,
+      serviceTask: serviceTask,
+      scriptTask: scriptTask,
+      ifVariable: ifVariable,
+    },
+    {
+      get(target, propKey, receiver) {
+        const origMethod = target[propKey];
+        if (origMethod === undefined) {
+          console.log(`Method ${propKey} does not exist`);
+        }
+        return origMethod;
+      },
+    }
+  );
   // eslint-disable-next-line no-eval
   eval(code);
   return saveProcess();

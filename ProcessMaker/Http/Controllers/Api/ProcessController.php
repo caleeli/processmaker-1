@@ -6,6 +6,7 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator;
 use ProcessMaker\Exception\TaskDoesNotHaveUsersException;
 use ProcessMaker\Facades\WorkflowManager;
@@ -17,6 +18,7 @@ use ProcessMaker\Http\Resources\ProcessRequests;
 use ProcessMaker\Jobs\ExportProcess;
 use ProcessMaker\Jobs\ImportProcess;
 use ProcessMaker\Models\Process;
+use ProcessMaker\Models\ProcessAICache;
 use ProcessMaker\Models\ProcessCategory;
 use ProcessMaker\Models\ProcessPermission;
 use ProcessMaker\Models\Screen;
@@ -1251,7 +1253,7 @@ class ProcessController extends Controller
             'max_tokens' => 1256,
             'temperature' => 0.5,
             'top_p' => 1,
-            'n' => 3,
+            'n' => 4,
             'frequency_penalty' => 0,
             'presence_penalty' => 0,
             'stop' => ["// END."]
@@ -1285,6 +1287,14 @@ class ProcessController extends Controller
             foreach ($response->choices as $choice) {
                 $options[] = $choice->text;// . "saveProcess();";
             }
+            $hash = md5($prompt);
+            // save each option to ProcessAICache table if it doesn't exist
+            foreach ($options as $option) {
+                ProcessAICache::firstOrCreate([
+                    'hash' => $hash,
+                    'code' => $option
+                ]);
+            }
             return ['options' => $options];
         }
         return ["error" => "The AI server is currently unavailable. Please try again later."];
@@ -1292,11 +1302,21 @@ class ProcessController extends Controller
 
     private function convertToPrompt($description)
     {
+        $description = trim($description);
         // load pre code from file
-        $code = file_get_contents(resource_path('ai/createProcess.ts'));
+        $code = file_get_contents(resource_path('ai/createProcess.js'));
         // replace mustache with description
         $code = str_replace('{{description}}', $description, $code);
         // return code
         return $code;
+    }
+
+    public function cachedSuggestedDiagrams()
+    {
+        $description = request()->input('description');
+        $prompt = $this->convertToPrompt($description);
+        $hash = md5($prompt);
+        $options = ProcessAICache::where('hash', $hash)->pluck('code');
+        return ['options' => $options];
     }
 }
