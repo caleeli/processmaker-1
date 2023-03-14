@@ -159,6 +159,8 @@ return [
         ProcessMaker\Providers\WorkflowServiceProvider::class,
         ProcessMaker\Providers\UpgradeServiceProvider::class,
 
+        App\Providers\OpenAiServiceProvider::class,
+
     ],
 
     'aliases' => [
