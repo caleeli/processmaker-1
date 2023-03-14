@@ -38,7 +38,8 @@
         "moment-timezone": "^0.5.31",
         "resolve-url-loader": "^3.1.2",
         "sass-loader": "^12.6.0",
-        "vue-loader": "^15.10.0"
+        "vue-loader": "^15.10.0",
+        "vue-step-wizard": "^0.1.17"
     },
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.1",
@@ -125,8 +126,5 @@
         "collectCoverage": true,
         "coverageDirectory": "<rootDir>/tests/js/coverage"
     },
-    "engines": {
-        "npm": "~8.9",
-        "node": "~16.15"
-    }
+    "engines": {}
 }
