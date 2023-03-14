@@ -1,5 +1,6 @@
 import Vue from "vue";
 import CreateProcessModal from "./components/CreateProcessModal";
+import CreateProcessModalSuggest from "./components/CreateProcessModalSuggest";
 import ProcessesListing from "./components/ProcessesListing";
 import CategorySelect from "./categories/components/CategorySelect";
 
@@ -10,6 +11,7 @@ new Vue({
   components: {
     CreateProcessModal,
     ProcessesListing,
+    CreateProcessModalSuggest
   },
   data: {
     filter: "",

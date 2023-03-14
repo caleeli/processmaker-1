@@ -133,5 +133,21 @@ ifVariable("approved", [
 // END.
 
 /*
+  The HR start a Onboarding Request and fill out the Checklist Form.
+  The IR work on IT Checklist Task.
+  The Facility work on Facility Checklist Task.
+  The HR review the Onboarding Information.
+  The new Employee receives an email with the Onboarding Information and the request ends.
+*/
+engine.startEvent("Start Onboarding Request", "HR");
+engine.userTask("Fill Out Checklist Form", "HR", ["itChecklist", "facilityChecklist"]);
+engine.userTask("IT Checklist", "IT", ["itChecklist"]);
+engine.userTask("Facility Checklist", "Facility", ["facilityChecklist"]);
+engine.userTask("Review", "HR", ["facilityChecklist"]);
+engine.emailTask("Onboard Information", "Employee");
+engine.endEvent("Employee Onboarded", false);
+// END.
+
+/*
   {{description}}
 */
