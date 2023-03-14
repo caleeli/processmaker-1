@@ -35,6 +35,14 @@ const engine = {
   serviceTask(name, url, method) {},
   /**
 
+   A function to create a email task with the specified name and role.
+   @param {string} name - The name of the service task.
+   @param {string} role - The role associated with the user task.
+   @returns {ID} - The ID of the service task.
+   */
+  emailTask(name, role) {},
+  /**
+
   A function to create an end event with the specified name and cancellation status.
   @param {string} name - The name of the end event.
   @param {boolean} cancelProcess - Whether to cancel the process when the event is triggered. Default is false.
@@ -75,6 +83,53 @@ ifVariable("verified", [
     { value: false, cb: () => { engine.serviceTask("Reject application", "/application", "POST"); } }
 ]);
 engine.endEvent("End", false);
+// END.
+
+/*
+  The Administrative Department start a Charge Request and fill out the form.
+  The Bursar Office review the request.
+  If approved the Student receives an Approval Notification and the requests ends.
+  If not approved the requests ends.
+*/
+engine.startEvent("Start Charge Request", "Administrative Department");
+engine.userTask("Fill Out Charge Form", "Administrative Department", ["charge"]);
+engine.userTask("Review Charge", "Bursar", ["approved"]);
+ifVariable("approved", [
+    {
+        value: true, cb: () => {
+            engine.emailTask("Approval Notification", "Student");
+            engine.endEvent("Charge Approved", false);
+        }
+    },
+    { value: false, cb: () => { engine.endEvent("Charge Rejected", true); } }
+]);
+// END.
+
+/*
+  The Student requests a change of major and fill a form.
+  The Academic Advisor receives a notification to review the request.
+  If the request is approved, the Registrar updates the Student Information System, the Student receives an Approval Notification and the request ends.
+  If the request is rejected, the Student receives an Rejection Notification and the request ends.
+*/
+engine.startEvent("Start Change Of Major Request", "Student");
+engine.userTask("Fill Out Change Of Major Form", "Student", ["change"]);
+engine.emailTask("Change Of Major Review Notification", "Academic Advisor ");
+engine.userTask("Review Change Of Major Request", "Academic Advisor", ["approved"]);
+ifVariable("approved", [
+    {
+        value: true, cb: () => {
+            engine.userTask("Change Of Major In Student Information System", "Registrar");
+            engine.emailTask("Approval Notification", "Student");
+            engine.endEvent("Change Of Major Approved", false);
+        }
+    },
+    {
+        value: false, cb: () => {
+            engine.emailTask("Rejection Notification", "Student");
+            engine.endEvent("Change Of Major Rejected", true);
+        }
+    }
+]);
 // END.
 
 /*
