@@ -13,9 +13,11 @@ class OpenAiTest extends TestCase
     {
         $route = route('api.processes.suggestedDiagrams');
         $response = $this->apiCall('POST', $route, [
-            'description' => 'Create a user task',
+            'description' => 'Create a process for a leave of absence request',
         ]);
 
         $response->assertStatus(200);
+
+        dd($response);
     }
 }
