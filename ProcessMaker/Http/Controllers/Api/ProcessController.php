@@ -6,6 +6,7 @@ use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use ProcessMaker\AI\Handlers\ProcessHandler;
 use ProcessMaker\Exception\TaskDoesNotHaveUsersException;
 use ProcessMaker\Facades\WorkflowManager;
 use ProcessMaker\Http\Controllers\Controller;
@@ -1199,122 +1200,13 @@ class ProcessController extends Controller
 
     public function suggestedDiagrams(Request $request)
     {
-        /*return [
-            'options' => [
-                '
-                startEvent("Start Registration", "Student");
-                userTask("Fill Course Form", "Student", ["courseId", "studentId"]);
-                scriptTask("Validate Course Form", "System");
-                serviceTask("Save Course Form", "System", "http://course-service.com/save", "POST");
-                userTask("Approve/Reject Registration", "Coordinator", ["approval"]);
-                ifVariable("approval", [
-                  { value: true, cb: () => {
-                      serviceTask("Send Confirmation Email", "System", "http://mail-service.com/send", "POST");
-                      endEvent("End Registration", "Student");
-                  }},
-                  { value: false, cb: () => {
-                      serviceTask("Send Rejection Email", "System", "http://mail-service.com/send", "POST");
-                      exitProcess("Exit Registration", "Student");
-                  }}
-                ]);
-                saveProcess();',
-                '
-                startEvent("Start Registration", "Student");
-                userTask("Fill Course Form", "Student", ["courseId", "studentId"]);
-                scriptTask("Validate Course Form", "System");
-                serviceTask("Save Course Form", "System", "http://course-service.com/save", "POST");
-                userTask("Approve/Reject Registration", "Coordinator", ["approval"]);
-                ifVariable("approval", [
-                  { value: true, cb: () => {
-                      serviceTask("Send Confirmation Email", "System", "http://mail-service.com/send", "POST");
-                      endEvent("End Registration", "Student");
-                  }},
-                  { value: false, cb: () => {
-                      serviceTask("Send Rejection Email", "System", "http://mail-service.com/send", "POST");
-                      exitProcess("Exit Registration", "Student");
-                  }}
-                ]);
-                saveProcess();',
-            ]
-        ];*/
         $description = $request->input('description');
 
-        $curl = curl_init();
+        $aiProcessHandler = new ProcessHandler();
+        $aiProcessHandler->generatePrompt($description);
+        $response = $aiProcessHandler->execute();
 
-        $prompt = $this->convertToPrompt($description);
-
-        $body = [
-            'model' => 'text-davinci-003',
-            'prompt' => $prompt,
-            'max_tokens' => 1256,
-            'temperature' => 0.5,
-            'top_p' => 1,
-            'n' => 4,
-            'frequency_penalty' => 0,
-            'presence_penalty' => 0,
-            'stop' => ['// END.'],
-        ];
-        curl_setopt_array($curl, [
-            CURLOPT_URL => 'https://api.openai.com/v1/completions',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => json_encode($body),
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-                'Authorization: Bearer ' . env('OPENAI_TOKEN'),
-            ],
-        ]);
-
-        $response = curl_exec($curl);
-        \Log::debug($response);
-        $response = json_decode($response);
-        curl_close($curl);
-
-        if (isset($response->error)) {
-            return ['error' => 'The AI server is currently unavailable. Please try again later.'];
-        }
-        if (isset($response->choices)) {
-            $options = [];
-            foreach ($response->choices as $choice) {
-                $options[] = $choice->text; // . "saveProcess();";
-            }
-            $hash = md5($prompt);
-            // save each option to ProcessAICache table if it doesn't exist
-            foreach ($options as $option) {
-                ProcessAICache::firstOrCreate([
-                    'hash' => $hash,
-                    'code' => $option,
-                ]);
-            }
-
-            return ['options' => $options];
-        }
-
-        return ['error' => 'The AI server is currently unavailable. Please try again later.'];
-    }
-
-    private function convertToPrompt($description)
-    {
-        $description = trim($description);
-        // load pre code from file
-        $code = file_get_contents(resource_path('ai/createProcess.js'));
-        // replace mustache with description
-        return str_replace('{{description}}', $description, $code);
-        // return code
-    }
-
-    public function cachedSuggestedDiagrams()
-    {
-        $description = request()->input('description');
-        $prompt = $this->convertToPrompt($description);
-        $hash = md5($prompt);
-        $options = ProcessAICache::where('hash', $hash)->pluck('code');
-
-        return ['options' => $options];
+        return response()->json($response);
     }
 }
+
