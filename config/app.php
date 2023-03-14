@@ -158,8 +158,7 @@ return [
         ProcessMaker\Providers\BroadcastServiceProvider::class,
         ProcessMaker\Providers\WorkflowServiceProvider::class,
         ProcessMaker\Providers\UpgradeServiceProvider::class,
-
-        App\Providers\OpenAiServiceProvider::class,
+        ProcessMaker\Providers\OpenAiServiceProvider::class,
 
     ],
 
