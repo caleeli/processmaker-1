@@ -1208,5 +1208,9 @@ class ProcessController extends Controller
 
         return response()->json($response);
     }
-}
 
+    public function rateModel(Request $request)
+    {
+        $rate = $request->input('rate');
+    }
+}
