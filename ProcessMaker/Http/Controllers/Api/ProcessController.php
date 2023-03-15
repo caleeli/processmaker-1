@@ -1215,12 +1215,19 @@ class ProcessController extends Controller
 
         $config = $aiProcessHandler->getConfig();
         $model = $aiProcessHandler->getModel();
+        $industry = $request->input('industry');
         $ratings = $request->input('ratings');
-        $hash = md5($model . $config);
+
+        $configForHash = &$config;
+        unset($configForHash['prompt']);
+        unset($configForHash['question']);
+
+        $hash = md5($model . $configForHash);
 
         foreach ($ratings as $rating) {
             AIModelRating::create([
                 'hash' => $hash,
+                'industry' => $industry,
                 'model' => $model,
                 'config' => $config,
                 'rating' => $rating->rating,
