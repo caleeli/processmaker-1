@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProcessAIRatingsTable extends Migration
+class CreateAIModelRatingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateProcessAIRatingsTable extends Migration
      */
     public function up()
     {
-        Schema::create('process_a_i_ratings', function (Blueprint $table) {
+        Schema::create('a_i_model_ratings', function (Blueprint $table) {
             $table->id();
             $table->string('hash');
             $table->text('model');
@@ -30,6 +30,6 @@ class CreateProcessAIRatingsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('process_a_i_ratings');
+        Schema::dropIfExists('a_i_model_ratings');
     }
 }
