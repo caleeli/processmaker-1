@@ -51,8 +51,8 @@
           <option value="human_resources">
             {{ $t("Human Resources") }}
           </option>
-          <option value="finance">
-            {{ $t("Finance") }}
+          <option value="education">
+            {{ $t("Education") }}
           </option>
         </select>
         <div v-if="hasError('category')" class="invalid-feedback">

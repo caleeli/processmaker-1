@@ -197,8 +197,7 @@ export default function createProcessAI(code) {
     addToLane(id, name, role, bounds);
     return id;
   }
-  function scriptTask(name) {
-    const role = findPreviousRole();
+  function scriptTask(name, role) {
     const id = nameToId(name + role + autoInc());
     const width = 100;
     const height = 80;
@@ -220,8 +219,7 @@ export default function createProcessAI(code) {
     return id;
   }
   function emailTask(name, role, to, subject) {
-    const rolePrevious = findPreviousRole();
-    const id = nameToId(name + rolePrevious + autoInc());
+    const id = nameToId(name + role + autoInc());
     const width = 100;
     const height = 80;
     // create script task
@@ -229,7 +227,15 @@ export default function createProcessAI(code) {
     emailTaskNode.setAttribute("id", id);
     emailTaskNode.setAttribute("name", name);
     emailTaskNode.setAttribute("implementation", "connector-send-email/processmaker-communication-email-send");
-    emailTaskNode.setAttribute("pm:config", "{&#34;emailServer&#34;:&#34;&#34;,&#34;type&#34;:&#34;text&#34;,&#34;subject&#34;:&#34;"+_.escape(subject)+"&#34;,&#34;textBody&#34;:&#34;Confirmation Email&#34;,&#34;screenRef&#34;:null,&#34;users&#34;:[],&#34;groups&#34;:[],&#34;toRecipients&#34;:"+_.escape(to)+",&#34;ccRecipients&#34;:[],&#34;bccRecipients&#34;:[],&#34;i&#34;:2}");
+    let config = "{&#34;emailServer&#34;:&#34;&#34;,&#34;type&#34;:&#34;text&#34;,&#34;subject&#34;:&#34;Confirmation Email&#34;,&#34;textBody&#34;:&#34;Confirmation Email&#34;,&#34;screenRef&#34;:null,&#34;users&#34;:[],&#34;groups&#34;:[],&#34;toRecipients&#34;:[],&#34;ccRecipients&#34;:[],&#34;bccRecipients&#34;:[],&#34;i&#34;:2}";
+    config = attributeObjectParse(config);
+    config.subject = subject;
+    config.toRecipients = [
+      {type: "email", value: to}
+    ];
+    config = attributeObjectStringify(config);
+    console.log('emailTask.config: ', config);
+    emailTaskNode.setAttribute("pm:config", config);
     process.appendChild(emailTaskNode);
     // create BPMNShape for script task
     const emailTaskShape = bpmn.createElement("bpmndi:BPMNShape");
@@ -240,7 +246,7 @@ export default function createProcessAI(code) {
     bounds.setAttribute("height", String(height));
     emailTaskShape.appendChild(bounds);
     plane.appendChild(emailTaskShape);
-    addToLane(id, name, rolePrevious, bounds);
+    addToLane(id, name, role, bounds);
     return id;
   }
   function serviceTask(name, url, method) {
@@ -517,6 +523,18 @@ export default function createProcessAI(code) {
   }
   function catchMessageEvent(name, role) { }
   function catchTimerEvent(name, role, isoDuration) { }
+  function attributeObjectParse(str) {
+    return JSON.parse(entityDecode(str));
+  }
+  function attributeObjectStringify(obj) {
+    return entityEncode(JSON.stringify(obj));
+  }
+  function entityEncode(s) {
+    return s.replace('"', "&#x22;");
+  }
+  function entityDecode(s) {
+    return s.replace("&#x22;", '"').replace('&#34;', '"');
+  }
   function initProcess() {
     currentCol = 0;
     previousElement = "";
