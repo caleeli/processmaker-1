@@ -72,6 +72,7 @@ export default {
   methods: {
     onSuggestSelect(suggest) {
       this.selectedSuggest = suggest;
+      this.$emit('selected', suggest);
     },
     parseDiagrams(response) {
       if (response.data.error) {
