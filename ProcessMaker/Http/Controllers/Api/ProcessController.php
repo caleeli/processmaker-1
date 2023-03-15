@@ -1201,9 +1201,11 @@ class ProcessController extends Controller
 
     public function suggestedDiagrams(Request $request)
     {
+        $industry = $request->input('category');
         $description = $request->input('description');
 
         $aiProcessHandler = new ProcessHandler();
+        $aiProcessHandler->setIndustry($industry);
         $response = $aiProcessHandler->generatePrompt($description)->execute();
 
         return response()->json($response);

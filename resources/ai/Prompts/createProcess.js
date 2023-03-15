@@ -130,7 +130,7 @@ engine.endEvent("Employee Onboarded", false);
 /*
   The HR start a Offboarding Request and fill out the Checklist Form.
   The IT work on IT Checklist Task.
-  The service task will call some external api to unsubscribe the user
+  The service task will call some external api to unsubscribe or remove the user from other applications
   The Facility work on Facility Checklist Task.
   The HR review the Onboarding Information.
   The new Employee receives an email with the Onboarding Information and the request ends.
@@ -138,7 +138,7 @@ engine.endEvent("Employee Onboarded", false);
 engine.startEvent("Start Onboarding Request", "HR");
 engine.userTask("Initiate Offboarding", "HR", ["itChecklist", "facilityChecklist"]);
 engine.userTask("IT Checklist Verification", "IT", ["itChecklist"]);
-engine.serviceTask("Delete user from Google", "/users/{userKey}", "DELETE");
+engine.serviceTask("Remove User Register", "/users/{userKey}", "DELETE");
 engine.userTask("Facility Checklist Verification", "Facility", ["facilityChecklist"]);
 engine.userTask("HR checklist Verification", "HR", ["facilityChecklist"]);
 engine.endEvent("Employee Offboarding", false);

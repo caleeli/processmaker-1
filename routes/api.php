@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
+use ProcessMaker\Http\Controllers\Api\AIConfigController;
 use ProcessMaker\Http\Controllers\Api\ChangePasswordController;
 use ProcessMaker\Http\Controllers\Api\CommentController;
 use ProcessMaker\Http\Controllers\Api\CssOverrideController;
@@ -122,7 +123,10 @@ Route::middleware('auth:api', 'setlocale', 'bindings', 'sanitize')->prefix('api/
     Route::post('process_events/{process}', [ProcessController::class, 'triggerStartEvent'])->name('process_events.trigger')->middleware('can:start,process');
     Route::post('processes/suggested-diagrams', [ProcessController::class, 'suggestedDiagrams'])->name('processes.suggestedDiagrams')->middleware('can:create-processes');
     Route::post('processes/cached-suggested-diagrams', [ProcessController::class, 'cachedSuggestedDiagrams'])->name('processes.cachedSuggestedDiagrams')->middleware('can:create-processes');
-    Route::post('processes/rate-model', [ProcessController::class, 'rateModel'])->name('processes.rateModel')->middleware('can:rate-model');
+    Route::post('processes/rate-model', [ProcessController::class, 'rateModel'])->name('processes.rateModel');
+    Route::get('ratings', [AIConfigController::class, 'ratingList'])->name('ratingList');
+    Route::get('current-config', [AIConfigController::class, 'currentConfig'])->name('currentConfig');
+    Route::post('save-config', [AIConfigController::class, 'store'])->name('processes.saveConfig');
 
     // List of Processes that the user can start
     Route::get('start_processes', [ProcessController::class, 'startProcesses'])->name('processes.start'); // Filtered in controller

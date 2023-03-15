@@ -33,6 +33,7 @@ export default function createProcessAI(code) {
     root.setAttribute("xmlns:dc", "http://www.omg.org/spec/DD/20100524/DC");
     root.setAttribute("xmlns:di", "http://www.omg.org/spec/DD/20100524/DI");
     root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    root.setAttribute("xmlns:pm", "http://processmaker.com/BPMN/2.0/Schema.xsd");
     root.setAttribute("targetNamespace", "http://bpmn.io/schema/bpmn");
     root.setAttribute(
       "xsi:schemaLocation",
@@ -218,7 +219,7 @@ export default function createProcessAI(code) {
     addToLane(id, name, role, bounds);
     return id;
   }
-  function emailTask(name, role, subject) {
+  function emailTask(name, role, to, subject) {
     const rolePrevious = findPreviousRole();
     const id = nameToId(name + rolePrevious + autoInc());
     const width = 100;
@@ -228,7 +229,7 @@ export default function createProcessAI(code) {
     emailTaskNode.setAttribute("id", id);
     emailTaskNode.setAttribute("name", name);
     emailTaskNode.setAttribute("implementation", "connector-send-email/processmaker-communication-email-send");
-    emailTaskNode.setAttribute("pm:config", "{&#34;emailServer&#34;:&#34;&#34;,&#34;type&#34;:&#34;text&#34;,&#34;subject&#34;:&#34;Confirmation Email&#34;,&#34;textBody&#34;:&#34;Confirmation Email&#34;,&#34;screenRef&#34;:null,&#34;users&#34;:[],&#34;groups&#34;:[],&#34;toRecipients&#34;:[],&#34;ccRecipients&#34;:[],&#34;bccRecipients&#34;:[],&#34;i&#34;:2}");
+    emailTaskNode.setAttribute("pm:config", "{&#34;emailServer&#34;:&#34;&#34;,&#34;type&#34;:&#34;text&#34;,&#34;subject&#34;:&#34;"+_.escape(subject)+"&#34;,&#34;textBody&#34;:&#34;Confirmation Email&#34;,&#34;screenRef&#34;:null,&#34;users&#34;:[],&#34;groups&#34;:[],&#34;toRecipients&#34;:"+_.escape(to)+",&#34;ccRecipients&#34;:[],&#34;bccRecipients&#34;:[],&#34;i&#34;:2}");
     process.appendChild(emailTaskNode);
     // create BPMNShape for script task
     const emailTaskShape = bpmn.createElement("bpmndi:BPMNShape");
@@ -586,13 +587,19 @@ export default function createProcessAI(code) {
       get(target, propKey, receiver) {
         const origMethod = target[propKey];
         if (origMethod === undefined) {
-          console.log(`Method ${propKey} does not exist`);
+          console.warn(`Method ${propKey} does not exist`);
+          return () => {};
         }
         return origMethod;
       },
     }
   );
   // eslint-disable-next-line no-eval
-  eval(code);
+  try {
+    eval(code);
+  } catch (e) {
+    console.warn(e, code);
+    // todo: call backend to report error with model
+  }
   return saveProcess();
 }
