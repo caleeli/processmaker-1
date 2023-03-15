@@ -11,7 +11,7 @@ class ProcessHandler extends OpenAIHandler
     private $config = [
         'model' => 'text-davinci-003',
         'max_tokens' => 1256,
-        'temperature' => 1,
+        'temperature' => 0,
         'top_p' => 1,
         'n' => 4,
         'frequency_penalty' => 0,
@@ -30,7 +30,17 @@ class ProcessHandler extends OpenAIHandler
             ->first();
 
         if ($config) {
-            $this->config = array_merge($this->config, json_decode($config->config, true));
+            $this->config = array_merge($this->config, $config->config);
+        }
+
+        foreach ($this->config as $key => $value) {
+            if ($key !== 'model' && $key !== 'stop' && $key !== 'max_tokens' && $key !== 'prompt') {
+                $this->config[$key] = floatval($value);
+            }
+
+            if ($key === 'max_tokens') {
+                $this->config[$key] = intval($value);
+            }
         }
 
         return $this->config;

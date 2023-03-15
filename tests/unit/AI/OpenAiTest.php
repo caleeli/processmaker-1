@@ -10,17 +10,16 @@ class OpenAiTest extends TestCase
 {
     use RequestHelper;
 
-    // public function testSuggestDiagram()
-    // {
-    //     $route = route('api.processes.suggestedDiagrams');
-    //     $response = $this->apiCall('POST', $route, [
-    //         'industry' => 'banking',
-    //         'description' => 'Create a process for a leave of absence request',
-    //     ]);
+    public function testSuggestDiagram()
+    {
+        $route = route('api.processes.suggestedDiagrams');
+        $response = $this->apiCall('POST', $route, [
+            'industry' => 'banking',
+            'description' => 'Create a process for a leave of absence request',
+        ]);
 
-    //     $response->assertStatus(200);
-    //     dd($response);
-    // }
+        $response->assertStatus(200);
+    }
 
     public function testSuggestDiagramWithConfigInDB()
     {
@@ -45,6 +44,5 @@ class OpenAiTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        dd($response);
     }
 }

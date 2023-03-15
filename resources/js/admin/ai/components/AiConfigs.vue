@@ -35,14 +35,14 @@ export default {
     return {
         industry: 'banking',
         config: {
-            'model': '',
-            'max_tokens': '',
-            'temperature': '',
-            'top_p': '',
-            'n': '',
-            'frequency_penalty': '',
-            'presence_penalty': '',
-            'stop': '',
+            'model': 'text-davinci-003',
+            'max_tokens': 1256,
+            'temperature': 0,
+            'top_p': 0,
+            'n': 0,
+            'frequency_penalty': 0,
+            'presence_penalty': 0,
+            'stop': '// END.',
         }
     };
   },
