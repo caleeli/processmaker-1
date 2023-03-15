@@ -108,6 +108,7 @@ mix.js("resources/js/app-layout.js", "public/js")
 
   // AI extra files
   .js("resources/js/processes/ai.js", "public/js/processes")
+  .js("resources/js/processes/process-converter.js", "public/js/processes")
 
   // Note, that this should go last for the extract to properly put the manifest and vendor in the right location
   // See: https://github.com/JeffreyWay/laravel-mix/issues/1118

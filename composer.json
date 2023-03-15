@@ -45,6 +45,7 @@
         "processmaker/pmql": "1.8.0",
         "pusher/pusher-php-server": "^7.0",
         "ralouphie/getallheaders": "^3.0",
+        "spatie/browsershot": "^3.57",
         "spatie/laravel-fractal": "^5.8",
         "spatie/laravel-medialibrary": "^9.9",
         "symfony/expression-language": "^5.4",

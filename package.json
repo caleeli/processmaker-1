@@ -76,6 +76,7 @@
         "npm-font-open-sans": "^1.1.0",
         "phpunserialize": "^1.0.1",
         "popper.js": "^1.16.1",
+        "puppeteer": "^19.7.5",
         "pusher-js": "^4.4.0",
         "snapsvg": "^0.5.1",
         "timezones.json": "^1.5.2",
