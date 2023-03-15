@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use ProcessMaker\Http\Controllers\AboutController;
+use ProcessMaker\Http\Controllers\Admin\AIConfigController;
 use ProcessMaker\Http\Controllers\Admin\AuthClientController;
 use ProcessMaker\Http\Controllers\Admin\CssOverrideController;
 use ProcessMaker\Http\Controllers\Admin\GroupController;
@@ -38,6 +39,7 @@ Route::middleware('auth', 'sanitize', 'external.connection', 'force_change_passw
     Route::prefix('admin')->group(function () {
         Route::get('queues', [QueuesController::class, 'index'])->name('queues.index');
         Route::get('settings', [SettingsController::class, 'index'])->name('settings.index')->middleware('can:view-settings');
+        Route::get('ai/config', [AIConfigController::class, 'index'])->name('ai.config.index')->middleware('can:view-settings');
         Route::get('ldap-logs', [LdapLogsController::class, 'index'])->name('ldap.index')->middleware('can:view-settings');
         Route::get('settings/export', [SettingsController::class, 'export'])->name('settings.export')->middleware('can:view-settings');
         Route::get('groups', [GroupController::class, 'index'])->name('groups.index')->middleware('can:view-groups');
