@@ -1216,10 +1216,10 @@ class ProcessController extends Controller
         $config = $aiProcessHandler->getConfig();
         $model = $aiProcessHandler->getModel();
         $ratings = $request->input('ratings');
-        $hash = md5($model);
+        $hash = md5($model . $config);
 
         foreach ($ratings as $rating) {
-            AIModelRating::firstOrCreate([
+            AIModelRating::create([
                 'hash' => $hash,
                 'model' => $model,
                 'config' => $config,
