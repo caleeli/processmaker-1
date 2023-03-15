@@ -1,5 +1,6 @@
 <template>
   <form-wizard
+    class="wizard"
     @onComplete="onComplete"
     @onNextStep="nextStep"
     @onPreviousStep="previousStep"
@@ -83,15 +84,12 @@
       </div>
     </tab-content>
     <tab-content :title="$t('Suggested Processes')">
-      <div class="form-group">
-        suggested...
-        <processes-preview
-          ref="processesPreview"
-          :name="formData.name"
-          :description="formData.description"
-          :category="formData.category"
-        />
-      </div>
+      <processes-preview
+        ref="processesPreview"
+        :name="formData.name"
+        :description="formData.description"
+        :category="formData.category"
+      />
     </tab-content>
     <tab-content title="Finishing Up" />
   </form-wizard>
@@ -149,3 +147,31 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.wizard {
+  width:100%;
+  padding: 0rem 1rem;
+  background: white;
+  height: 100%;
+}
+.step-body > form {
+  height: 100%;
+}
+.step-body > form > div {
+  height: 100%;
+}
+.step-footer {
+  margin: 0rem;
+}
+.step-button-previous {
+  border-radius: 0.2rem;
+  background-color: #00875A;
+  border-color: #00875A;
+}
+.step-button-next {
+  border-radius: 0.2rem;
+  background-color: #104A75;
+  border-color: #104A75;
+}
+</style>

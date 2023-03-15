@@ -1,37 +1,36 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
   <div>
-    
     <b-button
       v-b-modal.createProcessSuggest
       :aria-label="$t('Create Process')"
       class="mb-3 mb-md-0 ml-md-2"
       variant="info"
     >
-      <i class="fas fa-plus" /> {{ $t('Process Wizard') }}
+      <i class="fas fa-plus" /> {{ $t("Process Wizard") }}
     </b-button>
 
     <b-modal
       id="createProcessSuggest"
       centered
-      size="xl" 
+      modal-class="suggest-process-modal"
+      size="xl"
       :title="$t('Create Process')"
+      :hide-footer="true"
       @ok.prevent="onSubmit"
       @hidden="onClose"
-      :hide-footer="true"
     >
-      <b-card-body>
-          <StepFormValidation></StepFormValidation>
+      <b-card-body class="wizard-body">
+        <StepFormValidation></StepFormValidation>
       </b-card-body>
     </b-modal>
-
   </div>
 </template>
 
 <script>
 import { FormErrorsMixin, Modal, Required } from "SharedComponents";
 import BpmnViewer from "bpmn-js";
-import StepFormValidation from '../wizard/components/StepFormValidation'
+import StepFormValidation from "../wizard/components/StepFormValidation";
 
 export default {
   components: { Modal, Required, StepFormValidation },
@@ -83,7 +82,7 @@ export default {
         textArea.select();
         return new Promise((res, rej) => {
           // here the magic happens
-          document.execCommand('copy') ? res() : rej();
+          document.execCommand("copy") ? res() : rej();
           textArea.remove();
         });
       }
@@ -122,7 +121,9 @@ export default {
       } else if (response.data.options) {
         //this.$nextTick(() => {
         response.data.options.forEach(async (code) => {
-          const foundIndex = this.suggestedDiagrams.findIndex((d) => d.code === code);
+          const foundIndex = this.suggestedDiagrams.findIndex(
+            (d) => d.code === code
+          );
           if (foundIndex > -1) {
             // // move to the end
             // this.suggestedDiagrams.push(this.suggestedDiagrams[foundIndex]);
@@ -159,31 +160,45 @@ export default {
       this.loadingSuggestions = true;
       const awaitDiagrams = [];
       if (includeCache) {
-        awaitDiagrams.push(ProcessMaker.apiClient.post("processes/cached-suggested-diagrams", {
-          name: this.name,
-          description: this.description,
-        }, {
-          timeout: 120000,
-        })
+        awaitDiagrams.push(
+          ProcessMaker.apiClient
+            .post(
+              "processes/cached-suggested-diagrams",
+              {
+                name: this.name,
+                description: this.description,
+              },
+              {
+                timeout: 120000,
+              }
+            )
+            .then(async (response) => {
+              this.parseDiagrams(response);
+            })
+            .catch((error) => {
+              console.log(error);
+            })
+        );
+      }
+      awaitDiagrams.push(
+        ProcessMaker.apiClient
+          .post(
+            "processes/suggested-diagrams",
+            {
+              name: this.name,
+              description: this.description,
+            },
+            {
+              timeout: 360000,
+            }
+          )
           .then(async (response) => {
             this.parseDiagrams(response);
           })
           .catch((error) => {
             console.log(error);
-          }));
-      }
-      awaitDiagrams.push(ProcessMaker.apiClient.post("processes/suggested-diagrams", {
-        name: this.name,
-        description: this.description,
-      }, {
-        timeout: 360000,
-      })
-        .then(async (response) => {
-          this.parseDiagrams(response);
-        })
-        .catch((error) => {
-          console.log(error);
-        }));
+          })
+      );
       await Promise.all(awaitDiagrams);
       this.loadingSuggestions = false;
     },
@@ -217,7 +232,9 @@ export default {
         status: null,
       };
       if (this.process_category_id === "") {
-        this.addError = { process_category_id: ["{{__('The category field is required.')}}"] };
+        this.addError = {
+          process_category_id: ["{{__('The category field is required.')}}"],
+        };
         return;
       }
       // single click
@@ -234,15 +251,12 @@ export default {
         formData.append("file", this.file);
       }
 
-      ProcessMaker.apiClient.post(
-        "/processes",
-        formData,
-        {
+      ProcessMaker.apiClient
+        .post("/processes", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        },
-      )
+        })
         .then((response) => {
           ProcessMaker.alert(this.$t("The process was created."), "success");
           window.location = `/modeler/${response.data.id}`;
@@ -268,58 +282,23 @@ export default {
   max-width: none;
   height: 100%;
   margin: 0;
+  padding: 4rem 4rem 1rem 4rem;
 }
 .suggest-process-modal.modal .modal-content {
   height: 100%;
-  border: 0;
-  border-radius: 0;
 }
 .suggest-process-modal.modal .modal-body {
   overflow-y: auto;
 }
-.suggested-options {
-  width: 100%;
+.wizard-body {
+  display: flex;
+  flex-direction: column;
   height: 100%;
   overflow: hidden;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  padding: 0px;
 }
-.suggest-option {
-  width: calc(50% - 2rem);
-  height: calc(50% - 2rem);
-  overflow: auto;
-  cursor: grab;
-  margin: 1rem;
-  border: 1px solid black;
-  /* center content */
-  /*display: flex;
-  justify-content: center;
-  align-items: center;*/
-}
-.suggest-option:hover {
-  /* primary color shadow */
-  box-shadow: 0 0 0 4px #007bff;
-}
-.suggest-option-empty {
-  width: calc(50% - 2rem);
-  height: calc(50% - 2rem);
+.wizard-body .step-body {
+  height: calc(100% - 210px);
   overflow: hidden;
-  margin: 1rem;
-  /* center content */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.suggest-diagram svg {
-  pointer-events: none;
-}
-.suggest-selected {
-  width: calc(100% - 2rem);
-  height: calc(100% - 2rem);
-  overflow: auto;
-  margin: 1rem;
-  border: 1px solid black;
-  box-shadow: 0 0 0 4px #007bff;
 }
 </style>
