@@ -16,6 +16,7 @@ use ProcessMaker\Http\Resources\ProcessCollection;
 use ProcessMaker\Http\Resources\ProcessRequests;
 use ProcessMaker\Jobs\ExportProcess;
 use ProcessMaker\Jobs\ImportProcess;
+use ProcessMaker\Models\AIModelRating;
 use ProcessMaker\Models\Process;
 use ProcessMaker\Models\ProcessAICache;
 use ProcessMaker\Models\ProcessCategory;
@@ -1211,6 +1212,20 @@ class ProcessController extends Controller
 
     public function rateModel(Request $request)
     {
-        $rate = $request->input('rate');
+        $aiProcessHandler = new ProcessHandler();
+
+        $config = $aiProcessHandler->getConfig();
+        $ratings = $request->input('ratings');
+        $model = $request->input('model');
+        $hash = md5($model);
+
+        foreach ($ratings as $rating) {
+            AIModelRating::firstOrCreate([
+                'hash' => $hash,
+                'model' => $model,
+                'config' => $config,
+                'rating' => $rating->rating,
+            ]);
+        }
     }
 }
