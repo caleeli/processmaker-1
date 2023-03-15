@@ -70,13 +70,15 @@ class ProcessHandler extends OpenAIHandler
         return $this->config['presence_penalty'] = $presencePenalty;
     }
 
-    public function generatePrompt($description)
+    public function generatePrompt(String $description) : Object
     {
         $this->question = $description;
         $description = trim($description);
-        $model = file_get_contents(resource_path('ai/createProcess.js'));
+        $model = file_get_contents(resource_path('ai/Prompts/createProcess.js'));
 
-        return $this->config['prompt'] = str_replace('{{description}}', $description, $model);
+        $this->config['prompt'] = str_replace('{{description}}', $description, $model);
+
+        return $this;
     }
 
     public function execute()

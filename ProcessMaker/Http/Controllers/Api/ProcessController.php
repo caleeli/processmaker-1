@@ -1204,8 +1204,7 @@ class ProcessController extends Controller
         $description = $request->input('description');
 
         $aiProcessHandler = new ProcessHandler();
-        $aiProcessHandler->generatePrompt($description);
-        $response = $aiProcessHandler->execute();
+        $response = $aiProcessHandler->generatePrompt($description)->execute();
 
         return response()->json($response);
     }
