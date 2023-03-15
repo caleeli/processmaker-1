@@ -1,37 +1,15 @@
 <template>
   <div class="suggested-navbar">
-    <a href="#" @click="previous">
-      <i class="fa fa-chevron-left"></i>
-    </a>
-    <div class="suggested-options">
-      <div
-        v-for="(suggest, index) in suggestedDiagramsCursor"
-        :key="`suggest-${index}`"
-        :class="`suggest-option ${
-          selectedSuggest === suggest ? 'suggest-option-selected' : ''
-        }`"
-        @click="onSuggestSelect(suggest)"
-      >
+    <div
+      v-if="selected"
+      class="suggested-options"
+    >
         <div
           class="suggest-diagram"
           :style="`width: ${suggest.width}px; height: ${suggest.height}px;`"
           v-html="suggest.diagram"
         />
-      </div>
-      <div v-if="loadingSuggestions" class="suggest-option-empty">
-        <div class="spinner-border text-primary" role="status">
-          <span class="sr-only">Loading suggestions...</span>
-        </div>
-      </div>
-      <div
-        ref="bpmn_canvas"
-        class="suggest-diagram"
-        style="visibility: hidden"
-      />
     </div>
-    <a href="#" @click="next">
-      <i class="fa fa-chevron-right"></i>
-    </a>
   </div>
 </template>
 
@@ -41,18 +19,7 @@ import createProcessAI from "../../components/CreateProcessAI";
 
 export default {
   props: {
-    name: {
-      type: String,
-      default: "",
-    },
-    description: {
-      type: String,
-      default: "",
-    },
-    category: {
-      type: String,
-      default: "",
-    },
+    suggest: null,
   },
   data() {
     return {
@@ -182,58 +149,4 @@ export default {
 };
 </script>
 
-<style>
-.suggest-diagram .bjs-powered-by {
-  display: none;
-}
-.suggested-navbar {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-}
-.suggested-options {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.suggest-option {
-  width: calc(50% - 2rem);
-  height: calc(100% - 2rem);
-  overflow: auto;
-  cursor: grab;
-  margin: 1rem;
-  border: 1px solid black;
-}
-.suggest-option:hover {
-  box-shadow: 0 0 0 4px #007bff80;
-}
-.suggest-option-selected {
-  box-shadow: 0 0 0 4px #007bff;
-}
-.suggest-option-empty {
-  width: calc(50% - 2rem);
-  height: calc(50% - 2rem);
-  overflow: hidden;
-  margin: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.suggest-diagram svg {
-  pointer-events: none;
-}
-.suggest-selected {
-  width: calc(100% - 2rem);
-  height: calc(100% - 2rem);
-  overflow: auto;
-  margin: 1rem;
-  border: 1px solid black;
-  box-shadow: 0 0 0 4px #007bff;
-}
 </style>

@@ -71,7 +71,12 @@
         @selected="selectedProcess"
       />
     </tab-content>
-    <tab-content title="Finishing Up" />
+    <tab-content title="Finishing Up">
+      <single-process-preview
+        ref="processesPreview"
+        :selected="selected"
+      />
+    </tab-content>
   </form-wizard>
 </template>
 
@@ -80,6 +85,7 @@ import { FormWizard, TabContent, ValidationHelper } from "vue-step-wizard";
 import "vue-step-wizard/dist/vue-step-wizard.css";
 import { required } from "vuelidate/lib/validators";
 import ProcessesPreview from "./ProcessesPreview.vue";
+import SingleProcessPreview from "./SingleProcessPreview.vue";
 
 export default {
   name: "StepFormValidation",
@@ -87,6 +93,7 @@ export default {
     FormWizard,
     TabContent,
     ProcessesPreview,
+    SingleProcessPreview,
   },
   mixins: [ValidationHelper],
   data() {
@@ -100,6 +107,7 @@ export default {
         { name: { required }, description: { required } },
         { category: { required } },
       ],
+      selected: null,
     };
   },
   methods: {
@@ -120,6 +128,7 @@ export default {
       this.$refs.processesPreview.loadOptions();
     },
     selectedProcess(value) {
+      this.selected = value;
       this.formData.file = value.bpmn;
     },
   },

@@ -595,6 +595,11 @@ export default function createProcessAI(code) {
     }
   );
   // eslint-disable-next-line no-eval
-  eval(code);
+  try {
+    eval(code);
+  } catch (e) {
+    console.warn(e, code);
+    // todo: call backend to report error with model
+  }
   return saveProcess();
 }
