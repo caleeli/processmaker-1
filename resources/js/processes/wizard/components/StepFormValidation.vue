@@ -135,6 +135,9 @@ export default {
   background: white;
   height: 100%;
 }
+</style>
+
+<style>
 .step-body > form {
   height: 100%;
 }
@@ -148,10 +151,12 @@ export default {
   border-radius: 0.2rem;
   background-color: #00875a;
   border-color: #00875a;
+  font-weight: normal;
 }
 .step-button-next {
   border-radius: 0.2rem;
   background-color: #104a75;
   border-color: #104a75;
+  font-weight: normal;
 }
 </style>
