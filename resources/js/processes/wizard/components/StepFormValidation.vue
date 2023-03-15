@@ -63,15 +63,13 @@
       </div>
     </tab-content>
     <tab-content :title="$t('Suggested Processes')">
-      <div class="form-group">
-        <processes-preview
-          ref="processesPreview"
-          :name="formData.name"
-          :description="formData.description"
-          :category="formData.category"
-          @selected="selectedProcess"
-        />
-      </div>
+      <processes-preview
+        ref="processesPreview"
+        :name="formData.name"
+        :description="formData.description"
+        :category="formData.category"
+        @selected="selectedProcess"
+      />
     </tab-content>
     <tab-content title="Finishing Up" />
   </form-wizard>

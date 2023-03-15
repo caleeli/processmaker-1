@@ -66,10 +66,10 @@ export default {
     suggestedDiagramsCursor() {
       if (this.loadingSuggestions) {
         // get last 3 items
-        return this.suggestedDiagrams.slice(this.position, 1);
+        return this.suggestedDiagrams.slice(this.position, this.position + 1);
       }
       // get last 4 items
-      return this.suggestedDiagrams.slice(this.position, 2);
+      return this.suggestedDiagrams.slice(this.position, this.position + 2);
     },
   },
   methods: {

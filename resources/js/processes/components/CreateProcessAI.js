@@ -587,7 +587,8 @@ export default function createProcessAI(code) {
       get(target, propKey, receiver) {
         const origMethod = target[propKey];
         if (origMethod === undefined) {
-          console.log(`Method ${propKey} does not exist`);
+          console.warn(`Method ${propKey} does not exist`);
+          return () => {};
         }
         return origMethod;
       },
