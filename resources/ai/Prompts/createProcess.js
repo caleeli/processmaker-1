@@ -38,9 +38,11 @@ const engine = {
    A function to create a email task with the specified name and role.
    @param {string} name - The name of the service task.
    @param {string} role - The role associated with the user task.
+   @param {string} to - The user email that will receive the email.
+   @param {string} subject - The subject of the email
    @returns {ID} - The ID of the service task.
    */
-  emailTask(name, role) {},
+  emailTask(name, role, to, subject) {},
   /**
 
   A function to create an end event with the specified name and cancellation status.
@@ -60,30 +62,6 @@ const engine = {
 };
 
 // EXAMPLES:
-/*
-  Register to a course, be approved by a coordinator and send an email to the student
-*/
-engine.startEvent("Start", "Student");
-engine.userTask("Register to course", "Student", ["course"]);
-let approveRegistration = engine.userTask("Approve registration", "Coordinator", ["approved"]);
-ifVariable("approved", [
-    { value: true, cb: () => { engine.serviceTask("Send confirmation email", "/email", "POST"); } },
-    { value: false, cb: () => { engine.serviceTask("Send rejection email", "/email", "POST"); }, goBackTo: approveRegistration }
-]);
-// END.
-
-/*
-  The account opening process flow involves collecting information from the customer, verifying their identity, and setting up the account in the bank's systems. This typically includes completing an application, providing identification documents, and setting up any required account services, such as a debit card or online banking access.
-*/
-engine.startEvent("Start", "Customer");
-engine.userTask("Collect information", "Customer", ["information"]);
-engine.userTask("Verify identity", "Bank", ["verified"]);
-ifVariable("verified", [
-    { value: true, cb: () => { engine.serviceTask("Set up account", "/account", "POST"); } },
-    { value: false, cb: () => { engine.serviceTask("Reject application", "/application", "POST"); } }
-]);
-engine.endEvent("End", false);
-// END.
 
 /*
   The Administrative Department start a Charge Request and fill out the form.
@@ -92,12 +70,12 @@ engine.endEvent("End", false);
   If not approved the requests ends.
 */
 engine.startEvent("Start Charge Request", "Administrative Department");
-engine.userTask("Fill Out Charge Form", "Administrative Department", ["charge"]);
+engine.userTask("Fill Out Charge Form", "Administrative Department", ["charge", "student.email"]);
 engine.userTask("Review Charge", "Bursar", ["approved"]);
 ifVariable("approved", [
     {
         value: true, cb: () => {
-            engine.emailTask("Approval Notification", "Student");
+            engine.emailTask("Approval Notification", "Student", "{{student.email}}" , "This is the Approval Notification");
             engine.endEvent("Charge Approved", false);
         }
     },
@@ -112,20 +90,20 @@ ifVariable("approved", [
   If the request is rejected, the Student receives an Rejection Notification and the request ends.
 */
 engine.startEvent("Start Change Of Major Request", "Student");
-engine.userTask("Fill Out Change Of Major Form", "Student", ["change"]);
-engine.emailTask("Change Of Major Review Notification", "Academic Advisor ");
+engine.userTask("Fill Out Change Of Major Form", "Student", ["change", "student.email"]);
+engine.emailTask("Change Of Major Review Notification", "Academic Advisor", "{{student.email}}", "This is the Change Of Major Review Notification");
 engine.userTask("Review Change Of Major Request", "Academic Advisor", ["approved"]);
 ifVariable("approved", [
     {
         value: true, cb: () => {
-            engine.userTask("Change Of Major In Student Information System", "Registrar");
-            engine.emailTask("Approval Notification", "Student");
+            engine.userTask("Change Of Major In Student Information System", "Registrar", );
+            engine.emailTask("Approval Notification", "Student", "{{student.email}}", "This is the Approval Notification");
             engine.endEvent("Change Of Major Approved", false);
         }
     },
     {
         value: false, cb: () => {
-            engine.emailTask("Rejection Notification", "Student");
+            engine.emailTask("Rejection Notification", "Student", "{{student.email}}", "This is the Rejection Notification");
             engine.endEvent("Change Of Major Rejected", true);
         }
     }
@@ -140,12 +118,29 @@ ifVariable("approved", [
   The new Employee receives an email with the Onboarding Information and the request ends.
 */
 engine.startEvent("Start Onboarding Request", "HR");
-engine.userTask("Fill Out Checklist Form", "HR", ["itChecklist", "facilityChecklist"]);
+engine.userTask("Fill Out Checklist Form", "HR", ["itChecklist", "facilityChecklist", "employee.email"]);
 engine.userTask("IT Checklist", "IT", ["itChecklist"]);
 engine.userTask("Facility Checklist", "Facility", ["facilityChecklist"]);
 engine.userTask("Review", "HR", ["facilityChecklist"]);
-engine.emailTask("Onboard Information", "Employee");
+engine.emailTask("Onboard Information", "Employee", "{{employee.email}}", "Welcome, Job Onboarding is done!");
 engine.endEvent("Employee Onboarded", false);
+// END.
+
+/*
+  The HR start a Offboarding Request and fill out the Checklist Form.
+  The IT work on IT Checklist Task.
+  The service task will call some external api to unsubscribe the user
+  The Facility work on Facility Checklist Task.
+  The HR review the Onboarding Information.
+  The new Employee receives an email with the Onboarding Information and the request ends.
+*/
+engine.startEvent("Start Onboarding Request", "HR");
+engine.userTask("Initiate Offboarding", "HR", ["itChecklist", "facilityChecklist"]);
+engine.userTask("IT Checklist Verification", "IT", ["itChecklist"]);
+engine.serviceTask("Delete user from Google", "/users/{userKey}", "DELETE");
+engine.userTask("Facility Checklist Verification", "Facility", ["facilityChecklist"]);
+engine.userTask("HR checklist Verification", "HR", ["facilityChecklist"]);
+engine.endEvent("Employee Offboarding", false);
 // END.
 
 /*
