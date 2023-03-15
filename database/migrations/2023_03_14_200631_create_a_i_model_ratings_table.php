@@ -16,6 +16,7 @@ class CreateAIModelRatingsTable extends Migration
         Schema::create('a_i_model_ratings', function (Blueprint $table) {
             $table->id();
             $table->string('hash');
+            $table->text('industry');
             $table->text('model');
             $table->json('config');
             $table->json('rating');
