@@ -3,11 +3,12 @@
 namespace ProcessMaker\AI\Handlers;
 
 use OpenAI\Client;
+use ProcessMaker\Models\AiConfig;
 use ProcessMaker\Models\ProcessAICache;
 
 class ProcessHandler extends OpenAIHandler
 {
-    protected $config = [
+    private $config = [
         'model' => 'text-davinci-003',
         'max_tokens' => 1256,
         'temperature' => 1,
@@ -18,10 +19,20 @@ class ProcessHandler extends OpenAIHandler
         'stop' => '// END.',
     ];
 
-    protected $question = '';
+    private $industry = '';
+
+    private $question = '';
 
     public function getConfig()
     {
+        $config = AiConfig::where('industry', $this->industry)
+            ->latest()
+            ->first();
+
+        if ($config) {
+            $this->config = array_merge($this->config, json_decode($config->config, true));
+        }
+
         return $this->config;
     }
 
@@ -30,44 +41,54 @@ class ProcessHandler extends OpenAIHandler
         return file_get_contents(resource_path('ai/Prompts/createProcess.js'));
     }
 
+    public function getIndustry()
+    {
+        return $this->industry;
+    }
+
+    public function setIndustry(String $industry)
+    {
+        $this->industry = $industry;
+    }
+
     public function setModel(String $model)
     {
-        return $this->config['model'] = $model;
+        $this->config['model'] = $model;
     }
 
     public function setMaxTokens(int $maxTokens)
     {
-        return $this->config['max_token'] = $maxTokens;
+        $this->config['max_token'] = $maxTokens;
     }
 
     public function setTemperature(float $temperature)
     {
-        return $this->config['temperature'] = $temperature;
+        $this->config['temperature'] = $temperature;
     }
 
     public function setTopP(float $topP)
     {
-        return $this->config['top_p'] = $topP;
+        $this->config['top_p'] = $topP;
     }
 
     public function setN(int $n)
     {
-        return $this->config['n'] = $n;
+        $this->config['n'] = $n;
     }
 
     public function setStop(String $stop)
     {
-        return $this->config['stop'] = $stop;
+        $this->config['stop'] = $stop;
     }
 
     public function setFrequencyPenalty(float $frequencyPenalty)
     {
-        return $this->config['frequency_penalty'] = $frequencyPenalty;
+        $this->config['frequency_penalty'] = $frequencyPenalty;
     }
 
     public function setPresencePenalty(float $presencePenalty)
     {
-        return $this->config['presence_penalty'] = $presencePenalty;
+        $this->config['presence_penalty'] = $presencePenalty;
     }
 
     public function generatePrompt(String $description) : Object
@@ -86,7 +107,7 @@ class ProcessHandler extends OpenAIHandler
         $client = app(Client::class);
         $response = $client
             ->completions()
-            ->create($this->config);
+            ->create(array_merge($this->getConfig()));
 
         foreach ($response->choices as $choice) {
             $options[] = $choice->text;
