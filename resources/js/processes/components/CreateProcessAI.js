@@ -227,15 +227,7 @@ export default function createProcessAI(code) {
     emailTaskNode.setAttribute("id", id);
     emailTaskNode.setAttribute("name", name);
     emailTaskNode.setAttribute("implementation", "connector-send-email/processmaker-communication-email-send");
-    let config = "{&#34;emailServer&#34;:&#34;&#34;,&#34;type&#34;:&#34;text&#34;,&#34;subject&#34;:&#34;Confirmation Email&#34;,&#34;textBody&#34;:&#34;Confirmation Email&#34;,&#34;screenRef&#34;:null,&#34;users&#34;:[],&#34;groups&#34;:[],&#34;toRecipients&#34;:[],&#34;ccRecipients&#34;:[],&#34;bccRecipients&#34;:[],&#34;i&#34;:2}";
-    config = attributeObjectParse(config);
-    config.subject = subject;
-    config.toRecipients = [
-      {type: "email", value: to}
-    ];
-    config = attributeObjectStringify(config);
-    console.log('emailTask.config: ', config);
-    emailTaskNode.setAttribute("pm:config", config);
+    emailTaskNode.setAttribute("pm:config", "{&#34;emailServer&#34;:&#34;&#34;,&#34;type&#34;:&#34;text&#34;,&#34;subject&#34;:&#34;"+_.escape(subject)+"&#34;,&#34;textBody&#34;:&#34;Confirmation Email&#34;,&#34;screenRef&#34;:null,&#34;users&#34;:[],&#34;groups&#34;:[],&#34;toRecipients&#34;:"+_.escape(to)+",&#34;ccRecipients&#34;:[],&#34;bccRecipients&#34;:[],&#34;i&#34;:2}");
     process.appendChild(emailTaskNode);
     // create BPMNShape for script task
     const emailTaskShape = bpmn.createElement("bpmndi:BPMNShape");
@@ -530,7 +522,7 @@ export default function createProcessAI(code) {
     return entityEncode(JSON.stringify(obj));
   }
   function entityEncode(s) {
-    return s.replace('"', "&#x22;");
+    return s.replace('"', "&#34;");
   }
   function entityDecode(s) {
     return s.replace("&#x22;", '"').replace('&#34;', '"');
