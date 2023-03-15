@@ -154,16 +154,64 @@ export default {
 .step-footer {
   margin: 0rem;
 }
-.step-button-previous {
-  border-radius: 0.2rem;
-  background-color: #00875a;
-  border-color: #00875a;
-  font-weight: normal;
+.step-button-previous, .step-button-next, .step-button-submit {
+  display: inline-block;
+  font-weight: 400;
+  color: #212529;
+  text-align: center;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 0.125em;
 }
+
+.step-button-previous {
+  background-color: #FFFFFF;
+  color: #6C757D;
+  border-color: #6C757D;
+}
+
+.step-button-previous:hover {
+  color: #fff;
+  background-color: #6C757D;
+  border-color: #6C757D;
+}
+
 .step-button-next {
-  border-radius: 0.2rem;
-  background-color: #104a75;
-  border-color: #104a75;
-  font-weight: normal;
+  color: #fff;
+  background-color: #0872C2;
+}
+
+.step-button-next:hover {
+  color: #fff;
+  background-color: #065c9d;
+  border-color: #065591;
+}
+
+.step-button-submit {
+  color: #fff;
+  background-color: #00875A;
+}
+
+.step-button-submit:hover {
+  color: #fff;
+  background-color: #006141;
+  border-color: #005438;
+}
+
+.step-body, .step-footer {
+  box-shadow: none !important;
+}
+
+.step-pills {
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid #eee !important;
 }
 </style>
