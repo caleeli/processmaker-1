@@ -144,7 +144,7 @@ Route::get('password/reset/{token}', [ResetPasswordController::class, 'showReset
 Route::post('password/reset', [ResetPasswordController::class, 'reset']);
 Route::get('password/change', [ChangePasswordController::class, 'edit'])->name('password.change');
 
-//overwrite laravel passport
+// overwrite laravel passport
 Route::get('oauth/clients', [ClientController::class, 'index'])->name('passport.clients.index')->middleware('can:view-auth_clients');
 Route::get('oauth/clients/{client_id}', [ClientController::class, 'show'])->name('passport.clients.show')->middleware('can:view-auth_clients');
 Route::post('oauth/clients', [ClientController::class, 'store'])->name('passport.clients.store')->middleware('can:create-auth_clients');
@@ -157,3 +157,8 @@ Route::get('password/success', function () {
 
 Route::get('/unavailable', [UnavailableController::class, 'show'])->name('error.unavailable');
 Route::get('/ai-maker/{model}', [ScreenMakerController::class, 'create'])->name('screen_maker.create');
+Route::get('/ai-process-converter', function () {
+    $text = request()->input('text');
+
+    return view('ai-maker/process-converter', ['text' => json_encode($text)]);
+})->name('processes.ai-converter');
