@@ -5,7 +5,7 @@
     <div
       v-for="(suggest, index) in suggestedDiagramsCursor"
       :key="`suggest-${index}`"
-      class="suggest-option"
+      :class="`suggest-option ${selectedSuggest === suggest ? 'suggest-option-selected' : ''}`"
       @click="onSuggestSelect(suggest)"
     >
       <div
@@ -72,6 +72,7 @@ export default {
   methods: {
     onSuggestSelect(suggest) {
       this.selectedSuggest = suggest;
+      this.$emit('selected', suggest);
     },
     parseDiagrams(response) {
       if (response.data.error) {
@@ -150,23 +151,6 @@ export default {
 .suggest-diagram .bjs-powered-by {
   display: none;
 }
-.suggest-process-modal.modal {
-  padding: 0 !important;
-}
-.suggest-process-modal.modal .modal-dialog {
-  width: 100%;
-  max-width: none;
-  height: 100%;
-  margin: 0;
-}
-.suggest-process-modal.modal .modal-content {
-  height: 100%;
-  border: 0;
-  border-radius: 0;
-}
-.suggest-process-modal.modal .modal-body {
-  overflow-y: auto;
-}
 .suggested-options {
   width: 100%;
   height: 100%;
@@ -177,13 +161,16 @@ export default {
 }
 .suggest-option {
   width: calc(50% - 2rem);
-  height: calc(50% - 2rem);
+  height: calc(100% - 2rem);
   overflow: auto;
   cursor: grab;
   margin: 1rem;
   border: 1px solid black;
 }
 .suggest-option:hover {
+  box-shadow: 0 0 0 4px #007bff;
+}
+.suggest-option-selected {
   box-shadow: 0 0 0 4px #007bff;
 }
 .suggest-option-empty {
