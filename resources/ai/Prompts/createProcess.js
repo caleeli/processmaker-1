@@ -19,11 +19,12 @@ const engine = {
   userTask(name, role, outputVariables) {},
   /**
 
-  A function to create a script task with the specified name.
-  @param {string} name - The name of the script task.
-  @returns {ID} - The ID of the script task.
-  */
-  scriptTask(name) {},
+   A function to create a script task with the specified name.
+   @param {string} name - The name of the script task.
+   @param {string} role - The role associated with the user task.
+   @returns {ID} - The ID of the script task.
+   */
+  scriptTask(name, role) {},
   /**
 
   A function to create a service task with the specified name, URL, and HTTP method.
@@ -141,6 +142,57 @@ engine.serviceTask("Delete user from Google", "/users/{userKey}", "DELETE");
 engine.userTask("Facility Checklist Verification", "Facility", ["facilityChecklist"]);
 engine.userTask("HR checklist Verification", "HR", ["facilityChecklist"]);
 engine.endEvent("Employee Offboarding", false);
+// END.
+
+/*
+ This process coordinates the necessary actions for opening an account between a banker, customer, branch and system.
+ The Banker starts a request and fill the Business Account Information Form.
+ Then the System processes in a script this information and the Banker fills in the Application Form
+ The Banker decides how to complete the consumer's registration.
+ If the Banker decides to Send To Customer, then the Customer fills the Create User Profile Form, the Complete Application Form and People Associated.
+ If the Banker decides to complete In Person, the customer fill the People Associated Form.
+ The System process in a script the account application information.
+ Then the Banker Review the Application.
+ If the Banker approves the application, then the Branch create the account, the System runs a script that Streaming the Data and runs another script that Save Data to Collections, then the Customer will receive an Welcome Email and the application ends as approved.
+ If the Banker declines the application, then the Customer will receive an Declines Notification and the request ends as cancelled.
+*/
+engine.startEvent("Start Account Opening", "Banker");
+engine.userTask("Fill Out Business Account Information", "Banker", ["accountInformation", "account.email"]);
+engine.scriptTask("Process Business Account Information Data", "System");
+engine.userTask("Banker Fills Application", "Banker", ["howToComplete"]);
+engine.ifVariable("howToComplete", [
+    {
+        value: "Sent To Customer", cb: () => {
+            engine.userTask("Create User Profile", "Customer", ["userProfile"]);
+            engine.userTask("Complete Application", "Customer", ["accountInformation"]);
+            engine.userTask("People Associated", "Customer", ["peopleAssociated"]);
+        }
+    },
+    {
+        value: "In-Person", cb: () => {
+            engine.userTask("People Associated", "Customer", ["peopleAssociated"]);
+        }
+    }
+]);
+engine.scriptTask("Process Account Application", "System");
+engine.userTask("Review Application", "Banker", ["approved"]);
+engine.ifVariable("approved", [
+    {
+        value: true, cb: () => {
+            engine.userTask("Board Account", "Branch", ["accountInformation"]);
+            engine.scriptTask("Streaming Data", "System");
+            engine.scriptTask("Save Data To Collections", "System");
+            engine.emailTask("Welcome Email", "Customer", "{{account.email}}", "Your application was approved");
+            engine.endEvent("Application Approved", false);
+        }
+    },
+    {
+        value: false, cb: () => {
+            engine.emailTask("Declined Notification", "Customer", "{{account.email}}", "Your application was declined");
+            engine.endEvent("Application Declined", true);
+        }
+    }
+]);
 // END.
 
 /*
