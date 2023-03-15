@@ -21,7 +21,7 @@
       @hidden="onClose"
     >
       <b-card-body class="wizard-body">
-        <StepFormValidation></StepFormValidation>
+        <StepFormValidation @save_process="onSubmit"></StepFormValidation>
       </b-card-body>
     </b-modal>
   </div>

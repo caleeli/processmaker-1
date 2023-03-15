@@ -106,7 +106,7 @@ export default {
   },
   methods: {
     onComplete() {
-      this.$emit("saveprocess", this.formData);
+      this.$emit("save_process", this.formData);
     },
     nextStep() {
       if (this.storeState.currentTab === 0) {
