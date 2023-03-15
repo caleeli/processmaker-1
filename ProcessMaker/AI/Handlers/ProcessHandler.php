@@ -3,6 +3,7 @@
 namespace ProcessMaker\AI\Handlers;
 
 use OpenAI\Client;
+use ProcessMaker\Models\ProcessAICache;
 
 class ProcessHandler extends OpenAIHandler
 {
@@ -16,6 +17,8 @@ class ProcessHandler extends OpenAIHandler
         'presence_penalty' => 0,
         'stop' => '// END.',
     ];
+
+    protected $question = '';
 
     public function getConfig()
     {
@@ -62,6 +65,15 @@ class ProcessHandler extends OpenAIHandler
         return $this->config['presence_penalty'] = $presencePenalty;
     }
 
+    public function generatePrompt($description)
+    {
+        $this->question = $description;
+        $description = trim($description);
+        $code = file_get_contents(resource_path('ai/createProcess.js'));
+
+        return $this->config['prompt'] = str_replace('{{description}}', $description, $code);
+    }
+
     public function execute()
     {
         $client = app(Client::class);
@@ -73,16 +85,23 @@ class ProcessHandler extends OpenAIHandler
             $options[] = $choice->text;
         }
 
+        $response->question = $this->question;
         $response->options = $options;
+
+        $this->setCacheOptions($response);
 
         return $response;
     }
 
-    public function generatePrompt($description)
+    private function setCacheOptions($response)
     {
-        $description = trim($description);
-        $code = file_get_contents(resource_path('ai/createProcess.js'));
+        $hash = md5($this->config['prompt']);
 
-        return $this->config['prompt'] = str_replace('{{description}}', $description, $code);
+        foreach ($response->options as $option) {
+            ProcessAICache::firstOrCreate([
+                'hash' => $hash,
+                'code' => $option
+            ]);
+        }
     }
 }
