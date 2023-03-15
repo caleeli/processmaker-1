@@ -227,7 +227,7 @@ export default function createProcessAI(code) {
     emailTaskNode.setAttribute("id", id);
     emailTaskNode.setAttribute("name", name);
     emailTaskNode.setAttribute("implementation", "connector-send-email/processmaker-communication-email-send");
-    emailTaskNode.setAttribute("pm:config", "{&#34;emailServer&#34;:&#34;&#34;,&#34;type&#34;:&#34;text&#34;,&#34;subject&#34;:&#34;"+_.escape(subject)+"&#34;,&#34;textBody&#34;:&#34;Confirmation Email&#34;,&#34;screenRef&#34;:null,&#34;users&#34;:[],&#34;groups&#34;:[],&#34;toRecipients&#34;:"+_.escape(to)+",&#34;ccRecipients&#34;:[],&#34;bccRecipients&#34;:[],&#34;i&#34;:2}");
+    emailTaskNode.setAttribute("pm:config", '{"emailServer":"","type":"text","subject":"'+_.escape(subject)+'","textBody":"Text body","screenRef":null,"users":[],"groups":[],"toRecipients":[{"type":"email","value":"'+_.escape(to)+'"}],"ccRecipients":[],"bccRecipients":[],"i":4}');
     process.appendChild(emailTaskNode);
     // create BPMNShape for script task
     const emailTaskShape = bpmn.createElement("bpmndi:BPMNShape");
