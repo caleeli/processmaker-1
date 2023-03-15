@@ -218,6 +218,30 @@ export default function createProcessAI(code) {
     addToLane(id, name, role, bounds);
     return id;
   }
+  function emailTask(name, role, subject) {
+    const rolePrevious = findPreviousRole();
+    const id = nameToId(name + rolePrevious + autoInc());
+    const width = 100;
+    const height = 80;
+    // create script task
+    const emailTaskNode = bpmn.createElement("serviceTask");
+    emailTaskNode.setAttribute("id", id);
+    emailTaskNode.setAttribute("name", name);
+    emailTaskNode.setAttribute("implementation", "connector-send-email/processmaker-communication-email-send");
+    emailTaskNode.setAttribute("pm:config", "{&#34;emailServer&#34;:&#34;&#34;,&#34;type&#34;:&#34;text&#34;,&#34;subject&#34;:&#34;Confirmation Email&#34;,&#34;textBody&#34;:&#34;Confirmation Email&#34;,&#34;screenRef&#34;:null,&#34;users&#34;:[],&#34;groups&#34;:[],&#34;toRecipients&#34;:[],&#34;ccRecipients&#34;:[],&#34;bccRecipients&#34;:[],&#34;i&#34;:2}");
+    process.appendChild(emailTaskNode);
+    // create BPMNShape for script task
+    const emailTaskShape = bpmn.createElement("bpmndi:BPMNShape");
+    emailTaskShape.setAttribute("id", `${id}Shape`);
+    emailTaskShape.setAttribute("bpmnElement", id);
+    const bounds = bpmn.createElement("dc:Bounds");
+    bounds.setAttribute("width", String(width));
+    bounds.setAttribute("height", String(height));
+    emailTaskShape.appendChild(bounds);
+    plane.appendChild(emailTaskShape);
+    addToLane(id, name, rolePrevious, bounds);
+    return id;
+  }
   function serviceTask(name, url, method) {
     const role = findPreviousRole();
     const id = nameToId(name + role + autoInc());
@@ -556,6 +580,7 @@ export default function createProcessAI(code) {
       serviceTask: serviceTask,
       scriptTask: scriptTask,
       ifVariable: ifVariable,
+      emailTask: emailTask,
     },
     {
       get(target, propKey, receiver) {
