@@ -1215,8 +1215,8 @@ class ProcessController extends Controller
         $aiProcessHandler = new ProcessHandler();
 
         $config = $aiProcessHandler->getConfig();
+        $model = $aiProcessHandler->getModel();
         $ratings = $request->input('ratings');
-        $model = $request->input('model');
         $hash = md5($model);
 
         foreach ($ratings as $rating) {

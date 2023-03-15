@@ -8,6 +8,8 @@ abstract class OpenAIHandler
 {
     abstract public function getConfig();
 
+    abstract public function getModel();
+
     abstract public function setModel(String $model);
 
     abstract public function setMaxTokens(int $val);

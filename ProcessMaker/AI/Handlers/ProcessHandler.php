@@ -25,6 +25,11 @@ class ProcessHandler extends OpenAIHandler
         return $this->config;
     }
 
+    public function getModel()
+    {
+        return file_get_contents(resource_path('ai/Prompts/createProcess.js'));
+    }
+
     public function setModel(String $model)
     {
         return $this->config['model'] = $model;
@@ -69,9 +74,9 @@ class ProcessHandler extends OpenAIHandler
     {
         $this->question = $description;
         $description = trim($description);
-        $code = file_get_contents(resource_path('ai/createProcess.js'));
+        $model = file_get_contents(resource_path('ai/createProcess.js'));
 
-        return $this->config['prompt'] = str_replace('{{description}}', $description, $code);
+        return $this->config['prompt'] = str_replace('{{description}}', $description, $model);
     }
 
     public function execute()
