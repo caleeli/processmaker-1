@@ -33,6 +33,7 @@ export default function createProcessAI(code) {
     root.setAttribute("xmlns:dc", "http://www.omg.org/spec/DD/20100524/DC");
     root.setAttribute("xmlns:di", "http://www.omg.org/spec/DD/20100524/DI");
     root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    root.setAttribute("xmlns:pm", "http://processmaker.com/BPMN/2.0/Schema.xsd");
     root.setAttribute("targetNamespace", "http://bpmn.io/schema/bpmn");
     root.setAttribute(
       "xsi:schemaLocation",

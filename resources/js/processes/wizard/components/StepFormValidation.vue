@@ -5,10 +5,7 @@
     @onNextStep="nextStep"
     @onPreviousStep="previousStep"
   >
-    <tab-content
-      :title="$t('Process Information')"
-      :selected="true"
-    >
+    <tab-content :title="$t('Process Information')" :selected="true">
       <div class="form-group">
         <label for="name">{{ $t("Process") }}</label>
         <input
@@ -17,15 +14,9 @@
           class="form-control"
           :class="hasError('name') ? 'is-invalid' : ''"
           :placeholder="$t('Enter process name')"
-        >
-        <div
-          v-if="hasError('name')"
-          class="invalid-feedback"
-        >
-          <div
-            v-if="!$v.formData.name.required"
-            class="error"
-          >
+        />
+        <div v-if="hasError('name')" class="invalid-feedback">
+          <div v-if="!$v.formData.name.required" class="error">
             {{ $t("Please provide a valid name") }}
           </div>
         </div>
@@ -40,14 +31,8 @@
           :class="hasError('description') ? 'is-invalid' : ''"
           :placeholder="$t('Enter your description')"
         />
-        <div
-          v-if="hasError('description')"
-          class="invalid-feedback"
-        >
-          <div
-            v-if="!$v.formData.description.required"
-            class="error"
-          >
+        <div v-if="hasError('description')" class="invalid-feedback">
+          <div v-if="!$v.formData.description.required" class="error">
             {{ $t("Description is required") }}
           </div>
         </div>
@@ -70,26 +55,23 @@
             {{ $t("Finance") }}
           </option>
         </select>
-        <div
-          v-if="hasError('category')"
-          class="invalid-feedback"
-        >
-          <div
-            v-if="!$v.formData.category.required"
-            class="error"
-          >
+        <div v-if="hasError('category')" class="invalid-feedback">
+          <div v-if="!$v.formData.category.required" class="error">
             {{ $t("Please select category.") }}
           </div>
         </div>
       </div>
     </tab-content>
     <tab-content :title="$t('Suggested Processes')">
-      <processes-preview
-        ref="processesPreview"
-        :name="formData.name"
-        :description="formData.description"
-        :category="formData.category"
-      />
+      <div class="form-group">
+        <processes-preview
+          ref="processesPreview"
+          :name="formData.name"
+          :description="formData.description"
+          :category="formData.category"
+          @selected="selectedProcess"
+        />
+      </div>
     </tab-content>
     <tab-content title="Finishing Up" />
   </form-wizard>
@@ -124,25 +106,23 @@ export default {
   },
   methods: {
     onComplete() {
-      console.log("onComplete", this.storeState.currentTab);
-      console.log(this);
+      this.$emit("saveprocess", this.formData);
     },
     nextStep() {
-      console.log("nextStep", this.storeState.currentTab);
       if (this.storeState.currentTab === 0) {
         this.loadOptions();
       }
     },
     previousStep() {
       console.log("previousStep", this.storeState.currentTab);
-      alert("previousStep...");
-      console.log(this);
     },
     ///
     async loadOptions() {
       await this.$nextTick();
-      console.log("loadOptions");
       this.$refs.processesPreview.loadOptions();
+    },
+    selectedProcess(value) {
+      this.formData.file = value.bpmn;
     },
   },
 };
@@ -150,7 +130,7 @@ export default {
 
 <style scoped>
 .wizard {
-  width:100%;
+  width: 100%;
   padding: 0rem 1rem;
   background: white;
   height: 100%;
@@ -166,12 +146,12 @@ export default {
 }
 .step-button-previous {
   border-radius: 0.2rem;
-  background-color: #00875A;
-  border-color: #00875A;
+  background-color: #00875a;
+  border-color: #00875a;
 }
 .step-button-next {
   border-radius: 0.2rem;
-  background-color: #104A75;
-  border-color: #104A75;
+  background-color: #104a75;
+  border-color: #104a75;
 }
 </style>

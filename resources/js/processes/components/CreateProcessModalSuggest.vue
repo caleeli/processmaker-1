@@ -224,7 +224,11 @@ export default {
       this.selectedFile = "";
       this.file = null;
     },
-    onSubmit() {
+    onSubmit(value) {
+      this.name = value.name;
+      this.description = value.description;
+      this.process_category_id = 2;
+
       this.errors = {
         name: null,
         description: null,
@@ -247,6 +251,7 @@ export default {
       formData.append("name", this.name);
       formData.append("description", this.description);
       formData.append("process_category_id", this.process_category_id);
+      formData.append("bpmn", value.file);
       if (this.file) {
         formData.append("file", this.file);
       }
