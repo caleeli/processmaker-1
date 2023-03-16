@@ -241,7 +241,7 @@ export default function createProcessAI(code) {
     addToLane(id, name, role, bounds);
     return id;
   }
-  function serviceTask(name, url, method) {
+  /*function serviceTask(name, url, method) {
     const role = findPreviousRole();
     const id = nameToId(name + role + autoInc());
     const width = 100;
@@ -263,7 +263,7 @@ export default function createProcessAI(code) {
     plane.appendChild(serviceTaskShape);
     addToLane(id, name, role, bounds);
     return id;
-  }
+  }*/
   function endEvent(name, killAllThreads = false) {
     const role = findPreviousRole();
     const id = nameToId(name + role + autoInc());
@@ -588,7 +588,7 @@ export default function createProcessAI(code) {
       startEvent: startEvent,
       endEvent: endEvent,
       userTask: userTask,
-      serviceTask: serviceTask,
+      //serviceTask: serviceTask,
       scriptTask: scriptTask,
       ifVariable: ifVariable,
       emailTask: emailTask,

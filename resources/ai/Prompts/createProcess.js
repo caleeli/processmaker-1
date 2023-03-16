@@ -33,7 +33,7 @@ const engine = {
   @param {string} method - The HTTP method associated with the service task.
   @returns {ID} - The ID of the service task.
   */
-  serviceTask(name, url, method) {},
+  //serviceTask(name, url, method) {},
   /**
 
    A function to create a email task with the specified name and role.
@@ -138,7 +138,7 @@ engine.endEvent("Employee Onboarded", false);
 engine.startEvent("Start Onboarding Request", "HR");
 engine.userTask("Initiate Offboarding", "HR", ["itChecklist", "facilityChecklist"]);
 engine.userTask("IT Checklist Verification", "IT", ["itChecklist"]);
-engine.serviceTask("Remove User Register", "/users/{userKey}", "DELETE");
+//engine.serviceTask("Remove User Register", "/users/{userKey}", "DELETE");
 engine.userTask("Facility Checklist Verification", "Facility", ["facilityChecklist"]);
 engine.userTask("HR checklist Verification", "HR", ["facilityChecklist"]);
 engine.endEvent("Employee Offboarding", false);
