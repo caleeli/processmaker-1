@@ -20,6 +20,7 @@ import createProcessAI from "../../components/CreateProcessAI";
 export default {
   props: {
     suggest: null,
+    selected: null,
   },
   data() {
     return {

@@ -74,6 +74,7 @@
     <tab-content title="Finishing Up">
       <single-process-preview
         ref="processesPreview"
+        :suggest="selected"
         :selected="selected"
       />
     </tab-content>
