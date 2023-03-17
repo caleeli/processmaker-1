@@ -14,7 +14,7 @@
       >
         <div
           class="suggest-diagram"
-          :style="`width: ${suggest.width}px; height: ${suggest.height}px;`"
+          :style="`width: ${suggest.width}px; height: ${suggest.height}px; zoom: 50%;`"
           v-html="suggest.diagram"
         />
       </div>

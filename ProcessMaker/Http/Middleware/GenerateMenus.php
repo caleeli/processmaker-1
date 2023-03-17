@@ -165,6 +165,11 @@ class GenerateMenus
                     'customicon' => 'nav-icon fas bpmn-icon-end-event-signal',
                     'id' => 'signal',
                 ]);
+                $submenu->add(__('AI Models'), [
+                    'route' => 'ai.config.index',
+                    'customicon' => 'fas fa-brain',
+                    'id' => 'ai_models',
+                ]);
             }
         });
 

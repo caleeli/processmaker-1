@@ -1,7 +1,6 @@
 <template>
   <div class="suggested-navbar">
     <div
-      v-if="selected"
       class="suggested-options"
     >
         <div
