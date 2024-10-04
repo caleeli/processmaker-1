@@ -27,6 +27,7 @@ use ProcessMaker\Jobs\SmartInbox;
 use ProcessMaker\LicensedPackageManifest;
 use ProcessMaker\Managers;
 use ProcessMaker\Managers\MenuManager;
+use ProcessMaker\Managers\ScreenCompiledManager;
 use ProcessMaker\Models;
 use ProcessMaker\Observers;
 use ProcessMaker\PolicyExtension;
@@ -186,6 +187,11 @@ class ProcessMakerServiceProvider extends ServiceProvider
         // Register the directive to render script to initialize a component
         Blade::directive('vue', function ($expression) {
             return "<?php echo app(\ProcessMaker\Helpers\ViteHelper::class)->renderVue({$expression}); ?>";
+        });
+
+        // Register the compiled screen service
+        $this->app->singleton('compiledscreen', function ($app) {
+            return new ScreenCompiledManager();
         });
     }
 
