@@ -69,7 +69,7 @@ class RequestController extends Controller
 
         $defaultColumns = DefaultColumns::get('requests');
 
-        return view('requests.index', compact(
+        return view('requests.index2', compact(
             ['type', 'title', 'currentUser', 'userFilter', 'defaultColumns']
         ));
     }

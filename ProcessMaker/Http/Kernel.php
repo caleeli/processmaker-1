@@ -3,6 +3,7 @@
 namespace ProcessMaker\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use ProcessMaker\Http\Middleware\QueryLogMiddleware;
 
 class Kernel extends HttpKernel
 {
@@ -14,6 +15,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
+        QueryLogMiddleware::class,
         \Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \ProcessMaker\Http\Middleware\TrimStrings::class,
@@ -66,6 +68,7 @@ class Kernel extends HttpKernel
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'can' => \ProcessMaker\Http\Middleware\CustomAuthorize::class,
+        'etag' => \ProcessMaker\Http\Middleware\ETagMiddleware::class,
         'force_change_password' => \ProcessMaker\Http\Middleware\VerifyChangePasswordNeeded::class,
         'guest' => \ProcessMaker\Http\Middleware\RedirectIfAuthenticated::class,
         'permission' => \ProcessMaker\Http\Middleware\PermissionCheck::class,

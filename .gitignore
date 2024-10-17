@@ -44,3 +44,6 @@ resources/lang/de
 resources/lang/es
 resources/lang/fr
 devhub/pm-font/dist
+pm-o1/public/*
+pm-o1/.vscode/*
+pm-o1/.vscode/extensions.json

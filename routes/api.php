@@ -43,7 +43,7 @@ use ProcessMaker\Http\Controllers\TestStatusController;
 
 Route::middleware('auth:api', 'setlocale', 'bindings', 'sanitize')->prefix('api/1.0')->name('api.')->group(function () {
     // Users
-    Route::get('users', [UserController::class, 'index'])->name('users.index'); // Permissions handled in the controller
+    Route::get('users', [UserController::class, 'index'])->name('users.index')->middleware('etag:users'); // Permissions handled in the controller
     Route::get('users/{user}', [UserController::class, 'show'])->name('users.show'); // Permissions handled in the controller
     Route::get('deleted_users', [UserController::class, 'deletedUsers'])->name('users.deletedUsers')->middleware('can:view-users');
     Route::get('users/{user}/get_pinnned_controls', [UserController::class, 'getPinnnedControls'])->name('users.getPinnnedControls'); // Permissions handled in the controller
@@ -215,7 +215,7 @@ Route::middleware('auth:api', 'setlocale', 'bindings', 'sanitize')->prefix('api/
     // Cases
     Route::get('cases', [ProcessRequestController::class, 'index'])->name('cases.index');
     // Requests
-    Route::get('requests', [ProcessRequestController::class, 'index'])->name('requests.index'); // Already filtered in controller
+    Route::get('requests', [ProcessRequestController::class, 'index'])->name('requests.index')->middleware('etag:process_request_tokens'); // Already filtered in controller
     Route::get('requests/{process}/count', [ProcessRequestController::class, 'getCount'])->name('requests.count');
     Route::get('requests/{process}/default-chart', [ProcessRequestController::class, 'getDefaultChart'])->name('requests.default.chart');
     Route::get('requests/{request}', [ProcessRequestController::class, 'show'])->name('requests.show')->middleware('can:view,request');
@@ -242,7 +242,7 @@ Route::middleware('auth:api', 'setlocale', 'bindings', 'sanitize')->prefix('api/
     Route::delete('files/{file}', [FileController::class, 'destroy'])->name('files.destroy')->middleware('can:delete,file');
 
     // Notifications
-    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');  // Already filtered in controller
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index')->middleware('etag:notifications');  // Already filtered in controller
     Route::get('notifications/{notification}', [NotificationController::class, 'show'])->name('notifications.show')->middleware('can:view,notification');
     Route::post('notifications', [NotificationController::class, 'store'])->name('notifications.store')->middleware('can:create,ProcessMaker\Models\Notification');
     Route::put('notifications/{notification}', [NotificationController::class, 'update'])->name('notifications.update')->middleware('can:edit,notification');

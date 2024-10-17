@@ -15,10 +15,12 @@ use Laravel\Horizon\Horizon;
 use Laravel\Passport\Passport;
 use Lavary\Menu\Menu;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
+use Illuminate\Support\Facades\Blade;
 use ProcessMaker\Console\Migration\ExtendedMigrateCommand;
 use ProcessMaker\Events\ActivityAssigned;
 use ProcessMaker\Events\ScreenBuilderStarting;
 use ProcessMaker\Helpers\PmHash;
+use ProcessMaker\Helpers\ViteHelper;
 use ProcessMaker\ImportExport\Extension;
 use ProcessMaker\ImportExport\SignalHelper;
 use ProcessMaker\Jobs\SmartInbox;
@@ -28,6 +30,7 @@ use ProcessMaker\Managers\MenuManager;
 use ProcessMaker\Models;
 use ProcessMaker\Observers;
 use ProcessMaker\PolicyExtension;
+use ProcessMaker\View\Components\Requests;
 
 /**
  * Provide our ProcessMaker specific services.
@@ -55,6 +58,7 @@ class ProcessMakerServiceProvider extends ServiceProvider
 
     public function register(): void
     {
+        enableQueryTracking();
         // Dusk, if env is appropriate
         // TODO Remove Dusk references and remove from composer dependencies
         if (!$this->app->environment('production')) {
@@ -157,6 +161,31 @@ class ProcessMakerServiceProvider extends ServiceProvider
                 app('migrator'),
                 app('events')
             );
+        });
+
+        // ViteHelper singleton
+        $this->app->singleton(\ProcessMaker\Helpers\ViteHelper::class, function () {
+            return new ViteHelper();
+        });
+
+        // Register the directive to store assets
+        Blade::directive('vite', function ($assetPath) {
+            return "<?php app(\ProcessMaker\Helpers\ViteHelper::class)->register({$assetPath}); ?>";
+        });
+
+        // Register the directive to render all css stored assets
+        Blade::directive('viteRenderStyleAssets', function () {
+            return "<?php echo app(\ProcessMaker\Helpers\ViteHelper::class)->renderStyleAssets(); ?>";
+        });
+
+        // Register the directive to render all js stored assets
+        Blade::directive('viteRenderScriptAssets', function () {
+            return "<?php echo app(\ProcessMaker\Helpers\ViteHelper::class)->renderScriptAssets(); ?>";
+        });
+
+        // Register the directive to render script to initialize a component
+        Blade::directive('vue', function ($expression) {
+            return "<?php echo app(\ProcessMaker\Helpers\ViteHelper::class)->renderVue({$expression}); ?>";
         });
     }
 

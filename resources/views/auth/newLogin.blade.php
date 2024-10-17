@@ -162,6 +162,7 @@
   }
   .background-cover {
     background-color: black;
+    background-image: url(/img/new_background.jpg);
     background-repeat: no-repeat;
     background-size: cover;
     position: fixed;

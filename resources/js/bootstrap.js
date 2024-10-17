@@ -224,7 +224,7 @@ window.ProcessMaker.i18nPromise.then(() => { translationsLoaded = true; });
  */
 window.ProcessMaker.apiClient = require("axios");
 
-window.ProcessMaker.apiClient.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+// window.ProcessMaker.apiClient.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
 /**
  * Next we will register the CSRF Token as a common header with Axios so that

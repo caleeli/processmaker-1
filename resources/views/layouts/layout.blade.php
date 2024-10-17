@@ -128,7 +128,7 @@
 @endif
 <script src="{{ mix('js/manifest.js') }}"></script>
 <script src="{{ mix('js/vendor.js') }}"></script>
-<script src="{{ mix('js/app.js') }}"></script>
+<script src="@yield('app_js', mix('js/app.js'))"></script>
 <script>
   window.ProcessMaker.packages = @json(\App::make(ProcessMaker\Managers\PackageManager::class)->listPackages());
 </script>
