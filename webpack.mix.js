@@ -1,7 +1,36 @@
 const mix = require("laravel-mix");
+const webpack = require('webpack');
 const path = require("path");
 require("laravel-mix-polyfill");
 // const packageJson = require("./package.json");
+
+class FooterPlugin {
+  apply(compiler) {
+    compiler.hooks.compilation.tap('FooterPlugin', (compilation) => {
+      compilation.hooks.processAssets.tap(
+        {
+          name: 'FooterPlugin',
+          stage: webpack.Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_INLINE,
+        },
+        (assets) => {
+          for (const assetName in assets) {
+            if (assetName.endsWith('.js')) {
+              // Obtener el contenido original del archivo generado
+              const originalSource = assets[assetName].source();
+              // Añadir `console.timeEnd()` al final del archivo
+              const newSource = `console.time("Execution Time");\n${originalSource}\nconsole.timeEnd("Execution Time");`;
+              // Reemplazar el archivo generado con el nuevo contenido
+              assets[assetName] = {
+                source: () => newSource,
+                size: () => newSource.length,
+              };
+            }
+          }
+        }
+      );
+    });
+  }
+}
 
 /*
  |--------------------------------------------------------------------------
@@ -15,7 +44,9 @@ require("laravel-mix-polyfill");
 */
 
 mix.webpackConfig({
-  plugins: [],
+  plugins: [
+    new FooterPlugin(),
+  ],
   externals: ["monaco-editor", "SharedComponents", "ModelerInspector"],
   resolve: {
     extensions: [".*", ".js", ".ts", ".mjs", ".vue", ".json"],
@@ -134,7 +165,8 @@ mix
 
   // Note, that this should go last for the extract to properly put the manifest and vendor in the right location
   // See: https://github.com/JeffreyWay/laravel-mix/issues/1118
-  .js("resources/js/app.js", "public/js");
+  .js("resources/js/app.js", "public/js")
+  .js("resources/js/app2.js", "public/js");
   // .polyfill({
   //   enabled: true,
   //   useBuiltIns: false,

@@ -17,6 +17,19 @@ class ProcessMakerModel extends Model
 
     const MIGRATION_COLUMNS_CACHE_KEY = 'migration_columns';
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::saved(function ($model) {
+            Cache::forever('etag_version_' . $model->getTable(), md5(time()));
+        });
+
+        static::deleted(function ($model) {
+            Cache::forever('etag_version_' . $model->getTable(), md5(time()));
+        });
+    }
+
     /**
      * Prepare a date for array / JSON serialization.
      *

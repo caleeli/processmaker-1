@@ -87,7 +87,7 @@
         border-radius: 16px;
     }
     body {
-        background-image: url("/img/new_background.png");
+        background-image: url("/img/new_background.jpg");
         background-repeat: no-repeat;
         background-size: cover;
     }

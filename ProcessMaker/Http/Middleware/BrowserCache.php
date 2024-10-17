@@ -23,8 +23,8 @@ class BrowserCache
                 return $response;
             }
 
-            $response->header('pragma', 'no-cache');
-            $response->header('Cache-Control', 'no-store');
+            // $response->header('pragma', 'no-cache');
+            // $response->header('Cache-Control', 'no-store');
 
             return $response;
         } else {
