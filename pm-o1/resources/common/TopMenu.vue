@@ -1,5 +1,5 @@
 <template>
-    <header class="flex items-center justify-between bg-white px-6 py-4 shadow">
+    <header class="flex items-center justify-between bg-white px-6 py-4 shadow border-b border-gray-200">
         <!-- Menu Toggle Button for Small Screens -->
         <button @click="toggleMenu" class="md:hidden text-gray-600 hover:text-gray-800 focus:outline-none">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

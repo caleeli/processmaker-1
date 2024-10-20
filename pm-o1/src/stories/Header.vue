@@ -1,0 +1,50 @@
+<template>
+  <header>
+    <div class="pm-header">
+      <div>
+        <button @click="$emit('logo')" class="focus:outline-none">
+        <svg class="logo" width="32" height="32" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+          <g id="Iz0nnH.tif">
+            <path class="logo"
+              d="M6,13.36c0-.08,0-.17.07-.26a2,2,0,0,1,2-1.5h5.83l-.1.17a3.55,3.55,0,0,0-.67,2.13q0,9,0,18a4.82,4.82,0,0,1-3.25,4.65,4.9,4.9,0,0,1-1.31.25c-.84,0-1.69,0-2.53,0Z" />
+            <path class="logo"
+              d="M34.15,24.35c0,.34-.09.67-.14,1a7.27,7.27,0,0,1-6.27,5.92,7.87,7.87,0,0,1-.84,0H14.42V24.24H32.05A3.45,3.45,0,0,0,34,23.71a.48.48,0,0,1,.17-.05Z" />
+            <path class="logo"
+              d="M23.67,3.21a2.93,2.93,0,0,1,1.21.57,2.35,2.35,0,0,1,.85,1.76c0,1.79,0,3.57,0,5.36a1,1,0,0,1,0,.15,3.52,3.52,0,0,0-1.43-.66,5.49,5.49,0,0,0-.9-.09H8.13A3.68,3.68,0,0,0,6,11V10l.09-.57a7.19,7.19,0,0,1,5.39-6c.4-.09.8-.15,1.2-.22Z" />
+            <path class="logo"
+              d="M34.15,21.15a5.13,5.13,0,0,1-.27.78,1.76,1.76,0,0,1-1.59,1h-6c0-.07.06-.12.09-.16A3.5,3.5,0,0,0,27,20.67q0-7.46,0-14.91a3.81,3.81,0,0,0-.81-2.43.75.75,0,0,1-.07-.12h1.07l.49.08A7.51,7.51,0,0,1,34,9.4c.05.33.09.66.14,1Z" />
+          </g>
+        </svg>
+        </button>
+      </div>
+      <div>
+        <div class="user" v-if="user">
+          <b>{{ user.fullname }}</b>
+          <Avatar :user="user" class="ml-2" />
+        </div>
+      </div>
+    </div>
+  </header>
+</template>
+
+<script lang="ts" setup>
+import './header.css';
+import Avatar from './Avatar.vue';
+
+defineProps<{ user: { avatar: string, firstname: string, lastname: string, fullname: string } | null }>();
+
+defineEmits<{
+  (event: 'logo'): void;
+}>();
+
+</script>
+
+<style>
+.logo {
+  fill: #3A81FF;
+}
+.user {
+  display: flex;
+  align-items: center;
+}
+</style>
