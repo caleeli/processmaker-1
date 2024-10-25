@@ -5,23 +5,7 @@
     <main class="flex flex-row flex-1">
       <Sidebar :value="sidebar" @input="setSide" />
       <section class="flex-1 flex flex-col">
-        <div class="flex sm:mx-6 sm:mt-6 sm:space-x-6">
-          <CounterCard
-            color="primary"
-            count="101"
-            icon="chart-line"
-            title="My Requests"
-            link="/requests"
-          />
-          <CounterCard
-            color="light"
-            count="101"
-            title="My Tasks"
-            icon="tasks"
-            link="/tasks"
-          />
-        </div>
-        <Requests />
+        <slot />
       </section>
     </main>
   </div>
@@ -32,18 +16,14 @@ import { ref, defineProps } from 'vue';
 import './page.css';
 import MyHeader from './Header.vue';
 import Sidebar from './Sidebar.vue';
-import Requests from './Requests.vue';
-import CounterCard from './CounterCard.vue';
 
-//const user = ref<{ name: string } | null>(null);
 defineProps<{ user: { avatar: string, firstname: string, lastname: string, fullname: string } | null }>();
 
 // this.$refs.sidebar
-const sidebar = ref(false);
+const sidebar = ref(window.innerWidth > 768);
 
 const toggleSidebar = () => {
   sidebar.value = !sidebar.value;
-  console.log('sidebar', sidebar.value);
 };
 
 const setSide = (value: boolean) => {

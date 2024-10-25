@@ -1,22 +1,59 @@
 import { createApp } from 'vue'
 import axios from "axios";
 
+const commonMixin = {
+  methods: {
+    $t(text){
+      return text
+    }
+  },
+};
+
 window.ProcessMaker = {
   vueComponents: {},
-  mountComponent: (componentName, selector, props) => {
+  mountComponent(componentName, selector, props = {}, listeners = {}) {
     const el = document.querySelector(selector);
-    const component = window.ProcessMaker.vueComponents[componentName];
+    const component = this.vueComponents[componentName];
+
     if (!el) {
-      throw new Error(`Element ${selector} not found`);
+      throw new Error(`Elemento con el selector ${selector} no encontrado`);
     }
 
     if (!component) {
-      throw new Error(`Component ${componentName} not found`);
+      throw new Error(`Componente ${componentName} no encontrado`);
     }
 
-    const app = createApp(component, props);
+    // Disassemble any application and existing in the same element
+    if (el.__vue_app__) {
+      el.__vue_app__.unmount();
+    }
+
+    // Create the VUE application with the component and the props
+    const app = createApp(component, { ...props });
+    app.mixin(commonMixin);
+
+    // Link the events (listeners) to the VUE application
+    Object.keys(listeners).forEach((event) => {
+      app.config.globalProperties.$on = (eventName, callback) => {
+        if (eventName === event) {
+          el.addEventListener(event, callback);
+        }
+      };
+    });
+
+    // Assemble the application and store a reference to the instance in the element
+    el.__vue_app__ = app;
     app.mount(el);
 
+    return app;
+  },
+  mountApp(selector, config = {}, listeners = {}) {
+
+    const app = createApp({ ...config, components: this.vueComponents });
+    app.mixin(commonMixin);
+
+    app.mount(selector)
+    
     return app;
   },
   registerComponent: (componentName, component) => {

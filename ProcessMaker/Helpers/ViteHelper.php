@@ -19,7 +19,7 @@ class ViteHelper
     public function register(string $entry)
     {
         if (is_null(self::$manifest)) {
-            $manifestPath = base_path('pm-o1/public/pm-o1/.vite/manifest.json');
+            $manifestPath = base_path('public/pm-o1/.vite/manifest.json');
             if (!file_exists($manifestPath)) {
                 throw new Exception('El archivo de manifiesto de Vite no existe. Por favor, ejecuta "npm run build".');
             }

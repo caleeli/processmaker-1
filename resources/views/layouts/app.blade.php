@@ -16,9 +16,6 @@
             padding: 0;
             margin: 0;
         }
-        main {
-            overflow: auto;
-        }
     </style>
     @viteRenderStyleAssets()
 </head>

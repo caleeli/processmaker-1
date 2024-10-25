@@ -21,6 +21,31 @@ trait PluginServiceProviderTrait
 
     private $scriptBuilderScripts = [];
 
+    public function __construct($app)
+    {
+        parent::__construct($app);
+
+        // @todo: Use this trait for all the service providers to catch its timing
+        $this->booting(function () {
+            global $serviceProviderTimes;
+            $fullName = get_class($this);
+            // only class fullName
+            $name = str_replace('\\', '.', $fullName);
+            $serviceProviderTimes[$fullName] = [
+                'name' => $name,
+                'start_time' => microtime(true),
+            ];
+        });
+
+        $this->booted(function () {
+            global $serviceProviderTimes;
+            $fullName = get_class($this);
+            $serviceProviderTimes[$fullName]['end_time'] = microtime(true);
+            $serviceProviderTimes[$fullName]['time'] = $serviceProviderTimes[$fullName]['end_time']
+                - $serviceProviderTimes[$fullName]['start_time'];
+        });
+    }
+
     /**
      * Boot the PM plug-in.
      */
