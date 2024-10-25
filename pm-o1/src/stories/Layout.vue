@@ -4,7 +4,7 @@
 
     <main class="flex flex-row flex-1">
       <Sidebar :value="sidebar" @input="setSide" />
-      <section class="flex-1 flex flex-col">
+      <section class="flex-1 flex flex-col overflow-hidden">
         <slot />
       </section>
     </main>

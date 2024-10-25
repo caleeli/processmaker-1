@@ -67,7 +67,7 @@
                 <i class="fas fa-chevron-left"></i> Prev
             </button>
             <span class="text-gray-700">
-                {{ currentPage }}
+                Page {{ currentPage }} of {{ totalPages }}
             </span>
             <button @click="changePage(currentPage + 1)" :disabled="currentPage === totalPages"
                 class="px-2 py-1 rounded bg-blue-500 text-white hover:bg-blue-600 transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed">
