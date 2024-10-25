@@ -1,26 +1,35 @@
 <template>
-    <aside :class="['bg-gray-800 text-white h-full flex flex-col sidebar', sidebarOpen ? '' : 'closed']"
-        class="transition-all duration-300">
-        <nav class="mt-6 flex-1" :class="{ 'text-sm': showText }">
-            <a href="#" class="block py-2.5 px-4 hover:bg-gray-700 flex items-center justify-start">
-                <i class="text-lg fa fa-home mr-3"></i>
-                <span v-if="showText" class="transition-opacity duration-300">Started by me</span>
+    <aside
+        :class="['bg-gray-800 text-white h-full flex flex-col transition-all duration-300 sidebar', sidebarOpen ? 'pr-6' : 'closed']"
+        aria-label="Sidebar navigation">
+        <nav class="mt-6 flex-1 space-y-2">
+            <a href="#" class="flex items-center py-2.5 px-4 hover:bg-gray-700 transition-colors"
+                :aria-expanded="sidebarOpen">
+                <i class="fa fa-home text-lg"></i>
+                <span v-show="showText" class="ml-3 transition-opacity duration-300">Started by me</span>
             </a>
-            <a href="#" class="block py-2.5 px-4 hover:bg-gray-700 flex items-center justify-start">
-                <i class="text-lg fas fa-spinner mr-3"></i>
-                <span v-if="showText" class="transition-opacity duration-300">In Progress</span>
+
+            <a href="#" class="flex items-center py-2.5 px-4 hover:bg-gray-700 transition-colors"
+                :aria-expanded="sidebarOpen">
+                <i class="fas fa-spinner text-lg"></i>
+                <span v-show="showText" class="ml-3 transition-opacity duration-300">In Progress</span>
             </a>
-            <a href="#" class="block py-2.5 px-4 hover:bg-gray-700 flex items-center justify-start">
-                <i class="text-lg fas fa-check-circle mr-3"></i>
-                <span v-if="showText" class="transition-opacity duration-300">Completed</span>
+
+            <a href="#" class="flex items-center py-2.5 px-4 hover:bg-gray-700 transition-colors"
+                :aria-expanded="sidebarOpen">
+                <i class="fas fa-check-circle text-lg"></i>
+                <span v-show="showText" class="ml-3 transition-opacity duration-300">Completed</span>
             </a>
-            <a href="#" class="block py-2.5 px-4 hover:bg-gray-700 flex items-center justify-start">
-                <i class="text-lg fas fa-folder-open mr-3"></i>
-                <span v-if="showText" class="transition-opacity duration-300">All Cases</span>
+
+            <a href="#" class="flex items-center py-2.5 px-4 hover:bg-gray-700 transition-colors"
+                :aria-expanded="sidebarOpen">
+                <i class="fas fa-folder-open text-lg"></i>
+                <span v-show="showText" class="ml-3 transition-opacity duration-300">All Cases</span>
             </a>
         </nav>
+
         <div class="p-4">
-            <button @click="toggleSidebar" class="focus:outline-none">
+            <button @click="toggleSidebar" class="focus:outline-none" aria-label="Toggle sidebar">
                 <i :class="['fas', sidebarOpen ? 'fa-angle-left' : 'fa-angle-right']"></i>
             </button>
         </div>
@@ -69,26 +78,6 @@ export default {
 </script>
 
 <style>
-.truncate {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-/* Tailwind CSS is already applied */
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity .5s;
-}
-
-.fade-enter,
-.fade-leave-to {
-    opacity: 0;
-}
-
-.fixed-height-row {
-    height: 66px;
-}
 .sidebar {
     max-width: 100%;
     text-wrap: nowrap;

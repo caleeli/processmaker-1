@@ -9,6 +9,7 @@ const config: StorybookConfig = {
     "@chromatic-com/storybook",
     "@storybook/addon-interactions",
     '@storybook/addon-postcss',
+    "storybook-addon-mock",
   ],
   framework: {
     name: "@storybook/vue3-vite",

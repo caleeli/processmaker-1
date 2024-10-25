@@ -46,3 +46,4 @@ resources/lang/fr
 pm-o1/public/*
 pm-o1/.vscode/*
 pm-o1/.vscode/extensions.json
+public/pm-o1

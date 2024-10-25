@@ -15,14 +15,19 @@ export default defineConfig({
         find: '@',
         replacement: resolve(__dirname, 'resources/js'),
       },
+      // Enable the full Vue build (include template compiler)
+      {
+        find: 'vue',
+        replacement: 'vue/dist/vue.esm-bundler.js',
+      },
     ],
     extensions: ['.mjs', '.js', '.vue', '.json'],
   },
   build: {
-    sourcemap: true,
+    sourcemap: process.env.NODE_ENV === 'development' ? 'inline': false,
     manifest: true,
     target: 'esnext',
-    outDir: 'public/pm-o1/', // Set the public directory for output
+    outDir: '../public/pm-o1/', // Set the public directory for output
     rollupOptions: {
       input: jsFiles, // Use the array of JS file paths as entry points
       output: {
