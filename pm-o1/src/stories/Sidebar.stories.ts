@@ -14,7 +14,7 @@ const meta = {
     setup() {
       return { args };
     },
-    template: '<Sidebar :value="args.value" @input="args.value = $event" />',
+    template: '<Sidebar :value="args.value" :menu="args.menu" @input="args.value = $event" />',
   }),
   parameters: {
     // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout
@@ -31,7 +31,15 @@ type Story = StoryObj<typeof meta>;
 
 export const LoggedIn: Story = {
   args: {
-    value: true
+    value: true,
+    menu: [
+      { "title": "Home", "beforeHTML": null, "afterHTML": null, "nickname": "home", "divider": [], "attributes": { "id": "home", "class": null }, "isActive": false },
+      { "title": "Processes", "beforeHTML": null, "afterHTML": null, "nickname": "processes", "divider": [], "attributes": { "id": "process-browser", "class": null }, "isActive": false },
+      { "title": "Requests", "beforeHTML": null, "afterHTML": null, "nickname": "requests", "divider": [], "attributes": { "id": "requests", "class": "active" }, "isActive": true },
+      { "title": "Tasks", "beforeHTML": null, "afterHTML": null, "nickname": "tasks", "divider": [], "attributes": { "id": "tasks", "class": null }, "isActive": false },
+      { "title": "Designer", "beforeHTML": null, "afterHTML": null, "nickname": "designer", "divider": [], "attributes": { "id": "designer", "class": null }, "isActive": false },
+      { "title": "Admin", "beforeHTML": null, "afterHTML": null, "nickname": "admin", "divider": [], "attributes": { "id": "admin", "class": null }, "isActive": false }
+    ],
   },
 };
 

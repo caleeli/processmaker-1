@@ -6,7 +6,7 @@
         </div>
         <!-- Body -->
         <a :href="link">
-            <div v-if="showCount" :class="['m-0', 'font-bold', 'text-3xl sm:text-5xl', 'leading-tight']">{{ currentCount }}</div>
+            <div v-if="showCount" :class="['m-0', 'font-bold', 'text-3xl sm:text-5xl', 'leading-tight']">{{ count }}</div>
             <div class="leading-tight">{{ $t(title) }}</div>
         </a>
     </div>
@@ -16,7 +16,6 @@
 export default {
     data() {
         return {
-            currentCount: null,
             loaded: true,
         };
     },
@@ -48,9 +47,6 @@ export default {
             type: String,
             default: null,
         },
-    },
-    mounted() {
-        this.loadCount();
     },
     computed: {
         cardClass() {
@@ -91,32 +87,7 @@ export default {
             return this.$parent.$options._componentTag === 'counter-card-group';
         },
         showCount() {
-            return this.currentCount !== null;
-        },
-    },
-    methods: {
-        loadCount() {
-            if (this.count !== null) {
-                this.currentCount = this.count;
-            } else if (this.url !== null) {
-                if (!this.isInGroup) {
-                    ProcessMaker.apiClient
-                        .get(this.url)
-                        .then((response) => {
-                            this.setCount(response.data.meta.total);
-                        })
-                        .catch(() => {
-                            this.show();
-                        });
-                }
-            }
-        },
-        setCount(count) {
-            this.currentCount = count;
-            this.show();
-        },
-        show() {
-            this.loaded = true;
+            return this.count !== null;
         },
     },
 };

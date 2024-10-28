@@ -1,5 +1,21 @@
 <template>
-    <div class="bg-white w-full flex flex-col h-full" :class="{ 'p-6': !smallWidth }">
+        <div class="bg-white w-full flex flex-col h-full" :class="{ 'p-6': !smallWidth }">
+            <div class="flex sm:space-x-6">
+            <counter-card
+                color="primary"
+                :count="totalRequests"
+                icon="chart-line"
+                title="My Requests"
+                link="/requests"
+            ></counter-card>
+            <counter-card
+                color="light"
+                count="101"
+                title="My Tasks"
+                icon="tasks"
+                link="/tasks"
+            ></counter-card>
+        </div>
         <SpinnerOverlay :isLoading="loading" class="flex-1">
             <div class="overflow-auto">
                 <table class="min-w-full table-auto">
@@ -20,7 +36,9 @@
                                     {{ request.case_number }}
                                 </template>
                                 <template v-else-if="field.key === 'case_title'">
-                                    {{ request.case_title }}
+                                    <a :href="`/requests/${request.id}`">
+                                        {{ request.case_title }}
+                                    </a>
                                 </template>
                                 <template v-else-if="field.key === 'active_tasks'">
                                     <div class="line-clamp-2">
@@ -81,15 +99,18 @@
 import ShimmerLoading from '../components/ShimmerLoading.vue';
 import SpinnerOverlay from '../components/SpinnerOverlay.vue';
 import UpdateScreenSize from '../mixins/UpdateScreenSize';
+import CounterCard from './CounterCard.vue';
 
 export default {
     components: {
         ShimmerLoading,
         SpinnerOverlay,
+        CounterCard,
     },
     mixins: [UpdateScreenSize],
     data() {
         return {
+            totalRequests: 0,
             screenHeight: 0,
             requests: [],
             currentPage: 1,
@@ -161,6 +182,7 @@ export default {
                 .then(({ data }) => {
                     this.requests = data.data;
                     this.totalPages = data.meta.last_page;
+                    this.totalRequests = data.meta.total;
                 }).finally(() => {
                     this.loading = false;
                 });
