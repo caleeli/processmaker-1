@@ -276,3 +276,75 @@ if (!function_exists('shouldShow')) {
         }
     }
 }
+
+function enableQueryTracking()
+{
+    global $queriesLog;
+    global $startTime;
+    $startTime = microtime(true);
+    DB::enableQueryLog();
+    DB::flushQueryLog();
+    $queriesLog = [];
+    // Add time to queries
+    DB::listen(function ($query) {
+        global $queriesLog;
+        ob_start();
+        debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $trace = ob_get_clean();
+        $query->timestamp = microtime(true);
+        $query->trace = $trace;
+        $queriesLog[] = [
+            'query' => $query->sql,
+            'bindings' => $query->bindings,
+            'time' => $query->time,
+            'timestamp' => $query->timestamp,
+            'trace' => $trace,
+        ];
+    });
+}
+
+function closeQueryTracking(): array
+{
+    global $queriesLog;
+    // global $startTime;
+    $startTime = LARAVEL_START;
+    $endTime = microtime(true);
+    $totalTime = ($endTime - $startTime) * 1000;
+
+    $queries = $queriesLog;
+    DB::disableQueryLog();
+    //dd(DB::getQueryLog());
+
+    $t = $startTime;
+    foreach ($queries as $i => $query) {
+        $queries[$i]['time2'] = ($query['timestamp'] - $t) * 1000;
+        $t = $query['timestamp'];
+    }
+
+    // sort by time
+    usort($queries, function($a, $b) {
+        return $a['time'] < $b['time'];
+    });
+
+    // print queries and its time
+    $output = 'Total time: ' . $totalTime . "\n";
+    foreach ($queries as $i => $query) {
+        // add output using sprintf
+        $output .= sprintf("[%d] %.2f\t%.2f\t%s\n", $i, $query['time'], $query['time2'], $query['query']);
+        // find first processmaker/ProcessMaker in trace
+        $trace = explode("\n", $query['trace']);
+        foreach ($trace as $i => $line) {
+            if (strpos($line, '/ProcessMaker/') !== false) {
+                $output .= "\t" . $line . "\n";
+                // $output .= next 3 lines
+                for ($j = $i + 1; $j < $i + 4; $j++) {
+                    $output .= "\t" . $trace[$j] . "\n";
+                }
+                break;
+            }
+        }
+    }
+    Log::error($output);
+
+    return $queries;
+}
