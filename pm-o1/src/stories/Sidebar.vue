@@ -3,28 +3,14 @@
         :class="['bg-gray-800 text-white h-full flex flex-col transition-all duration-300 sidebar', sidebarOpen ? 'pr-6' : 'closed']"
         aria-label="Sidebar navigation">
         <nav class="mt-6 flex-1 space-y-2">
-            <a href="#" class="flex items-center py-2.5 px-4 hover:bg-gray-700 transition-colors"
-                :aria-expanded="sidebarOpen">
-                <i class="fa fa-home text-lg"></i>
-                <span v-show="showText" class="ml-3 transition-opacity duration-300">Started by me</span>
-            </a>
-
-            <a href="#" class="flex items-center py-2.5 px-4 hover:bg-gray-700 transition-colors"
-                :aria-expanded="sidebarOpen">
-                <i class="fas fa-spinner text-lg"></i>
-                <span v-show="showText" class="ml-3 transition-opacity duration-300">In Progress</span>
-            </a>
-
-            <a href="#" class="flex items-center py-2.5 px-4 hover:bg-gray-700 transition-colors"
-                :aria-expanded="sidebarOpen">
-                <i class="fas fa-check-circle text-lg"></i>
-                <span v-show="showText" class="ml-3 transition-opacity duration-300">Completed</span>
-            </a>
-
-            <a href="#" class="flex items-center py-2.5 px-4 hover:bg-gray-700 transition-colors"
-                :aria-expanded="sidebarOpen">
-                <i class="fas fa-folder-open text-lg"></i>
-                <span v-show="showText" class="ml-3 transition-opacity duration-300">All Cases</span>
+            <a
+                v-for="item in menu"
+                :href="url(item)"
+                class="flex items-center py-2.5 px-4 hover:bg-gray-700 transition-colors"
+                :aria-expanded="sidebarOpen"
+            >
+                <i :class="`${icon(item)} text-lg`"></i>
+                <span v-show="showText" class="ml-3 transition-opacity duration-300">{{ item.title }}</span>
             </a>
         </nav>
 
@@ -37,10 +23,27 @@
 </template>
 
 <script lang="ts">
+import Menu from "./Menu";
+
+// Menu icons
+const icons: { [key: string]: string } = {
+    home: 'fa fa-home',
+    tasks: 'fa fa-tasks',
+    processes: 'fa fa-cogs',
+    requests: 'fa fa-briefcase',
+    designer: 'fa fa-paint-brush',
+    admin: 'fa fa-user-cog',
+    _default: 'fa fa-question',
+};
+
 export default {
     props: {
         value: {
             type: Boolean,
+        },
+        menu: {
+            type: Array as () => Menu[],
+            default: () => [],
         },
     },
     data() {
@@ -51,6 +54,12 @@ export default {
         };
     },
     methods: {
+        icon(menu: Menu) {
+            return icons[menu.nickname] || icons._default;
+        },
+        url(menu: Menu) {
+            return `/${menu.attributes.id}`;
+        },
         toggleSidebar() {
             this.sidebarOpen = !this.sidebarOpen;
             this.$emit('input', this.sidebarOpen);
