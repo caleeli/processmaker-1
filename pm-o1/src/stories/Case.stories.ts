@@ -1,25 +1,25 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 
-import CaseComponent from './Case.vue';
+import Case from './Case.vue';
 
 // Mock data for API calls if your component makes any
 
 const meta = {
-    title: 'Example/CaseComponent',
-    component: CaseComponent,
+    title: 'Example/Case',
+    component: Case,
     render: (args: any) => ({
-        components: { CaseComponent },
+        components: { Case },
         setup() {
             return { args };
         },
-        template: '<CaseComponent v-bind="args" />',
+        template: '<Case v-bind="args" />',
     }),
     parameters: {
         layout: 'fullscreen',
         mockData: [
             // Mock API response if needed
             {
-                url: '/tasks?page=1&process_request_id=undefined&status=ACTIVE&per_page=15&order_by=id&order_direction=desc',
+                url: '/tasks?page=1&process_request_id=undefined&per_page=15&order_by=id&order_direction=desc',
                 method: 'GET',
                 status: 200,
                 response: {
@@ -966,8 +966,8 @@ const meta = {
             name: 'Contract Management',
             process_id: 1,
             process_version_id: 150,
-            updated_at: '16.08.2014 12:15:57',
-            created_at: '10.07.2014 23:36:57',
+            updated_at: '2024-11-07T10:40:16-04:00',
+            created_at: '2024-11-07T10:40:16-04:00',
             participants: [
                 { fullname: 'Alice', avatar: 'https://i.pravatar.cc/150?u=Alice' },
                 { fullname: 'Bob', avatar: 'https://i.pravatar.cc/150?u=Bob' },
@@ -975,33 +975,10 @@ const meta = {
                 { fullname: 'Dana', avatar: 'https://i.pravatar.cc/150?u=Dana' },
                 { fullname: 'Eve', avatar: 'https://i.pravatar.cc/150?u=Eve' },
             ],
-            completionPercentage: 60,
-            feedActivities: [
-                {
-                    user: { fullname: 'Mark Johnson', avatar: 'img/a2.jpg' },
-                    timeAgo: '2h ago',
-                    message: "posted message on Monica Smith's site.",
-                    date: 'Today 2:10 pm - 12.06.2014',
-                    content:
-                        "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
-                },
-                // Add more feed activities as needed
-            ],
-            activities: [
-                {
-                    status: 'Completed',
-                    title: 'Create project in webapp',
-                    startTime: '12.07.2014 10:10:1',
-                    endTime: '14.07.2014 10:16:36',
-                    comments:
-                        "Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable.",
-                },
-                // Add more activities as needed
-            ],
         },
     },
     tags: ['autodocs'],
-} satisfies Meta<typeof CaseComponent>;
+} satisfies Meta<typeof Case>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

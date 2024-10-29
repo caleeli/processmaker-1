@@ -58,7 +58,7 @@
         <div class="mt-8">
             <div>
                 <nav class="flex space-x-4 border-b">
-                    <button @click="activeTab = 'messages'" :class="tabClass('messages')"
+                    <button @click="activeTab = 'tasks'" :class="tabClass('tasks')"
                         class="px-3 py-2 text-sm font-medium border-b-2">
                         Tasks
                     </button>
@@ -69,27 +69,7 @@
                 </nav>
             </div>
             <div class="mt-6">
-                <div v-if="activeTab === 'messages'">
-                    <!-- Feed Activities -->
-                    <div v-for="(activity, index) in caseData.feedActivities" :key="index"
-                        class="flex items-start mb-6">
-                        <img :src="activity.user.avatar" :alt="activity.user.fullname"
-                            class="w-10 h-10 rounded-full mr-4">
-                        <div class="flex-1">
-                            <div class="flex justify-between">
-                                <div>
-                                    <strong>{{ activity.user.fullname }}</strong> {{ activity.message }}<br>
-                                    <small class="text-gray-500">{{ activity.date }}</small>
-                                </div>
-                                <small class="text-gray-500">{{ activity.timeAgo }}</small>
-                            </div>
-                            <div v-if="activity.content" class="mt-2 p-3 bg-gray-100 rounded">
-                                {{ activity.content }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div v-if="activeTab === 'activity'">
+                <div v-if="activeTab === 'tasks'">
                     <!-- Activities Table -->
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -97,23 +77,42 @@
                                 <th class="p-3 font-medium text-gray-700 border-b">Status</th>
                                 <th class="p-3 font-medium text-gray-700 border-b">Title</th>
                                 <th class="p-3 font-medium text-gray-700 border-b">Start Time</th>
-                                <th class="p-3 font-medium text-gray-700 border-b">End Time</th>
-                                <th class="p-3 font-medium text-gray-700 border-b">Comments</th>
+                                <th class="p-3 font-medium text-gray-700 border-b">Completed Time</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(activity, index) in caseData.activities" :key="index">
+                            <tr v-for="(activity, index) in tasks" :key="index">
                                 <td class="p-3 border-b">
-                                    <span class="px-2 py-1 text-white bg-blue-600 rounded-full">{{ activity.status
-                                        }}</span>
+                                    <span class="px-2 py-1 text-white bg-blue-600 rounded-full">
+                                        {{ activity.status }}
+                                    </span>
                                 </td>
-                                <td class="p-3 border-b">{{ activity.title }}</td>
-                                <td class="p-3 border-b">{{ activity.startTime }}</td>
-                                <td class="p-3 border-b">{{ activity.endTime }}</td>
-                                <td class="p-3 border-b">{{ activity.comments }}</td>
+                                <td class="p-3 border-b">{{ activity.element_name }}</td>
+                                <td class="p-3 border-b">{{ activity.created_at }}</td>
+                                <td class="p-3 border-b">{{ activity.completed_at }}</td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                <div v-if="activeTab === 'activity'">
+                    <!-- Feed Activities -->
+                    <div v-for="(activity, index) in tasks" :key="index"
+                        class="flex items-start mb-6">
+                        <img :src="activity.user.avatar" :alt="activity.user.fullname"
+                            class="w-10 h-10 rounded-full mr-4">
+                        <div class="flex-1">
+                            <div class="flex justify-between">
+                                <div>
+                                    <strong>{{ activity.user.fullname }}</strong> {{ activity.element_name }}<br>
+                                    <small class="text-gray-500">{{ activity.created_at }}</small>
+                                </div>
+                                <small class="text-gray-500">{{ activity.timeAgo }}</small>
+                            </div>
+                            <div v-if="activity.status" class="mt-2 p-3 bg-gray-100 rounded">
+                                {{ activity.status }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -126,14 +125,6 @@ import { ref, defineProps } from 'vue';
 interface Participant {
     fullname: string;
     avatar: string;
-}
-
-interface FeedActivity {
-    user: Participant;
-    timeAgo: string;
-    message: string;
-    date: string;
-    content?: string;
 }
 
 interface Activity {
@@ -155,13 +146,11 @@ interface CaseData {
     updated_at: string;
     created_at: string;
     participants: Participant[];
-    completionPercentage: number;
-    feedActivities: FeedActivity[];
 }
 
 const props = defineProps<{ caseData: CaseData }>();
 
-const activeTab = ref<'messages' | 'activity'>('messages');
+const activeTab = ref<'tasks' | 'activity'>('tasks');
 const tasks = ref<Activity[]>([]);
 
 const tabClass = (tabName: string) =>
@@ -171,8 +160,8 @@ const tabClass = (tabName: string) =>
 
 // Load task function
 const loadTasks = async () => {
-    const response = await window.ProcessMaker.apiClient.get(`tasks?page=1&process_request_id=${props.caseData.id}&status=ACTIVE&per_page=15&order_by=id&order_direction=desc`);
-    tasks.value = response.data.data;
+    const response = await window.ProcessMaker.apiClient.get(`tasks?page=1&process_request_id=${props.caseData.id}&per_page=15&order_by=id&order_direction=desc`);
+    tasks.value.splice(0, tasks.value.length, ...response.data.data);
 };
 
 // Call loadTasks on mount

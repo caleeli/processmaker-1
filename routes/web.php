@@ -147,6 +147,7 @@ Route::middleware('auth', 'session_kill', 'sanitize', 'force_change_password', '
         return redirect()->route('cases_by_type', ['type' => $type]);
     })->where('type', 'all|in_progress|completed')->name('requests_by_type')->middleware('no-cache');
 
+    Route::get('open_request/{request}', [RequestController::class, 'openRequest'])->name('requests.open');
     Route::get('requests/{request}', [RequestController::class, 'show'])->name('requests.show');
     Route::get('request/{request}/files/{media}', [RequestController::class, 'downloadFiles'])->middleware('can:view,request');
     Route::get('requests/search', [RequestController::class, 'search'])->name('requests.search');

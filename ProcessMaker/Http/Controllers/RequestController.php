@@ -281,4 +281,16 @@ class RequestController extends Controller
             $request->summary_screen['config'] = $translatedConf;
         }
     }
+
+    public function openRequest(ProcessRequest $request)
+    {
+        // add $request participants
+        $request->participants;
+        $request->user;
+        $currentUser = Auth::user()->only(['id', 'username', 'fullname', 'firstname', 'lastname', 'avatar']);
+        return view('requests.open', compact(
+            'request',
+            'currentUser'
+        ));
+    }
 }
