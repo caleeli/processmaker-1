@@ -370,7 +370,7 @@ class Setting extends ProcessMakerModel implements HasMedia
             }
         }
 
-        return $url . '?id=' . bin2hex(random_bytes(16));
+        return $url;
     }
 
     /**
