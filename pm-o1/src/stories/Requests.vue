@@ -37,7 +37,7 @@
                                 </template>
                                 <template v-else-if="field.key === 'case_title'">
                                     <a :href="`/requests/${request.id}`">
-                                        {{ request.case_title }}
+                                        {{ request.case_title || request.name }}
                                     </a>
                                 </template>
                                 <template v-else-if="field.key === 'active_tasks'">
