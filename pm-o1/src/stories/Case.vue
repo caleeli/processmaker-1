@@ -2,7 +2,7 @@
     <div class="bg-white p-6 rounded-lg shadow">
         <!-- Case Header -->
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold">{{ caseData.case_title }}</h2>
+            <h2 class="text-2xl font-bold">{{ caseData.case_title || caseData.name }}</h2>
         </div>
 
         <!-- Case Details -->

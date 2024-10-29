@@ -31,6 +31,7 @@ const icons: { [key: string]: string } = {
     tasks: 'fa fa-tasks',
     processes: 'fa fa-cogs',
     requests: 'fa fa-briefcase',
+    cases: 'fa fa-briefcase',
     designer: 'fa fa-paint-brush',
     admin: 'fa fa-user-cog',
     _default: 'fa fa-question',
