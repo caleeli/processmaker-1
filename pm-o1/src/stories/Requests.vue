@@ -1,6 +1,6 @@
 <template>
-    <div class="bg-white w-full flex flex-col h-full" :class="{ 'p-6': !smallWidth }">
-        <div class="flex sm:space-x-6 mb-4">
+    <div class="bg-white w-full flex flex-col h-full overflow-auto" :class="{ 'p-6': !smallWidth }">
+        <div class="flex space-x-6 mb-4 justify-center">
             <counter-card
                 color="primary"
                 :count="totalRequests"
