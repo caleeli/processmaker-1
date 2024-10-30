@@ -20,18 +20,18 @@
                 </div>
                 <div class="flex mb-2">
                     <dt class="w-1/3 text-right font-medium">Created by:</dt>
-                    <dd class="w-2/3 pl-4">{{ caseData.user.fullname }}</dd>
+                    <dd class="w-2/3 pl-4 flex items-center">
+                        <img :src="caseData.user.avatar" :alt="caseData.user.fullname" class="w-8 h-8 rounded-full mr-2" />
+                        {{ caseData.user.fullname }}
+                    </dd>
                 </div>
                 <div class="flex mb-2">
                     <dt class="w-1/3 text-right font-medium">Process:</dt>
                     <dd class="w-2/3 pl-4">
-                        <a :href="`/process-browser/${caseData.process_id}`" target="_blank" class="text-blue-600 hover:underline">{{
-                            caseData.name }}</a>
+                        <a :href="`/process-browser/${caseData.process_id}`" target="_blank" class="text-blue-600 hover:underline">
+                            {{ caseData.name }}
+                        </a>
                     </dd>
-                </div>
-                <div class="flex mb-2">
-                    <dt class="w-1/3 text-right font-medium">Version:</dt>
-                    <dd class="w-2/3 pl-4">{{ caseData.process_version_id }}</dd>
                 </div>
             </div>
             <!-- Right Column -->
@@ -77,10 +77,9 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr>
-                                <th class="p-3 font-medium text-gray-700 border-b">Status</th>
-                                <th class="p-3 font-medium text-gray-700 border-b">Title</th>
-                                <th class="p-3 font-medium text-gray-700 border-b hidden md:table-cell">Start Time</th>
-                                <th class="p-3 font-medium text-gray-700 border-b hidden md:table-cell">Completed Time</th>
+                                <th class="p-3 font-bold text-gray-700 border-b">Status</th>
+                                <th class="p-3 font-bold text-gray-700 border-b">Title</th>
+                                <th class="p-3 font-bold text-gray-700 border-b hidden md:table-cell">Due Date</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -91,8 +90,7 @@
                                     </span>
                                 </td>
                                 <td class="p-3 border-b">{{ activity.element_name }}</td>
-                                <td class="p-3 border-b hidden md:table-cell">{{ formatDate(activity.created_at) }}</td>
-                                <td class="p-3 border-b hidden md:table-cell">{{ formatDate(activity.completed_at) }}</td>
+                                <td class="p-3 border-b hidden md:table-cell">{{ formatDate(activity.due_at) }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -136,6 +134,7 @@ interface Activity {
     element_name: string;
     created_at: string;
     completed_at: string;
+    due_at: string;
     user: Participant;
 }
 
@@ -164,11 +163,14 @@ const tabClass = (tabName: string) =>
 
 // Load task function
 const loadTasks = async () => {
-    const response = await window.ProcessMaker.apiClient.get(`tasks?page=1&process_request_id=${props.caseData.id}&per_page=15&order_by=id&order_direction=desc`);
+    const response = await window.ProcessMaker.apiClient.get(`/api/1.1/tasks?page=1&process_request_id=${props.caseData.id}&per_page=15&order_by=id&order_direction=desc`);
     tasks.value = response.data.data;
 };
 
 const formatDate = (time: string): string => {
+    if (!time) {
+        return '';
+    }
     return DateFormatter.instance.formatDate(new Date(time));
 }
 

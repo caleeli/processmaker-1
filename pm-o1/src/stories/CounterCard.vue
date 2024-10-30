@@ -1,5 +1,5 @@
 <template>
-    <div :class="['flex flex-row border-0 p-4', cardClass]">
+    <div :class="['flex flex-row border-0 p-4 rounded-lg', cardClass]">
         <!-- Header -->
         <div :class="headerClass">
             <i :class="['fas fa-2x', iconClass]"></i>
