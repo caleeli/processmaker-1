@@ -25,7 +25,7 @@
                                     {{ request.case_number }}
                                 </template>
                                 <template v-else-if="field.key === 'case_title'">
-                                    <a :href="`/open_request/${request.id}`">
+                                    <a :href="`/open_request/${request.id}`" class="text-blue-600 hover:underline">
                                         {{ request.case_title || request.name }}
                                     </a>
                                 </template>
