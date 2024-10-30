@@ -33,6 +33,20 @@ class TaskController extends Controller
     {
         $query = ProcessRequestToken::select($this->defaultFields)
             ->where('element_type', 'task');
+        $include = request()->get('include', '');
+        $include = $include ? explode(',', $include) : [];
+
+        if (in_array('user', $include)) {
+            $query->with(['user' => function ($query) {
+                $query->select([
+                    'id',
+                    'firstname',
+                    'lastname',
+                    'email',
+                    'avatar',
+                ]);
+            }]);
+        }
 
         $this->processFilters(request(), $query);
 
