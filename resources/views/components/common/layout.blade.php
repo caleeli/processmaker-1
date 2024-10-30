@@ -13,8 +13,8 @@
         data() {
             return {
                 user: @json($user),
-                menu: @json($items),
-                data: @json($data),
+                menu: @json($items ?? []),
+                data: @json($data ?? []),
             }
         },
     });
