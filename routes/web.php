@@ -135,7 +135,7 @@ Route::middleware('auth', 'session_kill', 'sanitize', 'force_change_password', '
 
     Route::post('/keep-alive', [LoginController::class, 'keepAlive'])->name('keep-alive');
     // Cases
-    Route::get('cases', [RequestController::class, 'index'])->name('cases.index')->middleware('etag:process_request_tokens');
+    Route::get('cases', [RequestController::class, 'index'])->name('cases.index')->middleware('etag:users,saved_searches');
     Route::get('cases/{type?}', [RequestController::class, 'index'])->name('cases_by_type')
         ->where('type', 'all|in_progress|completed')
         ->middleware('no-cache');
@@ -147,7 +147,7 @@ Route::middleware('auth', 'session_kill', 'sanitize', 'force_change_password', '
         return redirect()->route('cases_by_type', ['type' => $type]);
     })->where('type', 'all|in_progress|completed')->name('requests_by_type')->middleware('no-cache');
 
-    Route::get('open_request/{request}', [RequestController::class, 'openRequest'])->name('requests.open');
+    Route::get('open_request/{request}', [RequestController::class, 'openRequest'])->name('requests.open')->middleware('etag:users,process_requests');
     Route::get('requests/{request}', [RequestController::class, 'show'])->name('requests.show');
     Route::get('request/{request}/files/{media}', [RequestController::class, 'downloadFiles'])->middleware('can:view,request');
     Route::get('requests/search', [RequestController::class, 'search'])->name('requests.search');
