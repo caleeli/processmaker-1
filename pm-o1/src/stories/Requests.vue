@@ -110,7 +110,7 @@ export default {
     mixins: [UpdateScreenSize],
     data() {
         return {
-            totalRequests: 0,
+            totalRequests: localStorage.getItem('totalRequests') || 0,
             screenHeight: 0,
             requests: [],
             currentPage: 1,
@@ -183,6 +183,7 @@ export default {
                     this.requests = data.data;
                     this.totalPages = data.meta.last_page;
                     this.totalRequests = data.meta.total;
+                    localStorage.setItem('totalRequests', this.totalRequests);
                 }).finally(() => {
                     this.loading = false;
                 });
