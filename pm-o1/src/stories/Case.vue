@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white p-6 overflow-auto h-full w-full">
+    <div class="bg-white p-6 overflow-y-scroll h-full w-full">
         <!-- Case Header -->
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold">{{ caseData.case_title || caseData.name }}</h2>
@@ -163,7 +163,7 @@ const tabClass = (tabName: string) =>
 
 // Load task function
 const loadTasks = async () => {
-    const response = await window.ProcessMaker.apiClient.get(`/api/1.1/tasks?page=1&process_request_id=${props.caseData.id}&per_page=15&order_by=id&order_direction=desc`);
+    const response = await window.ProcessMaker.apiClient.get(`/api/1.1/tasks?page=1&process_request_id=${props.caseData.id}&per_page=15&order_by=id&order_direction=desc&include=user`);
     tasks.value = response.data.data;
 };
 
@@ -175,7 +175,12 @@ const formatDate = (time: string): string => {
 }
 
 const goBack = () => {
-    window.history.back();
+    const previousPage = window.history.state ? window.history.state.previousPage : null;
+    if (previousPage) {
+        window.location.href = previousPage;
+    } else {
+        window.location.href = '/cases';
+    }
 };
 
 // Call loadTasks on mount
