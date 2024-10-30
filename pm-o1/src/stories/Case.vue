@@ -3,6 +3,9 @@
         <!-- Case Header -->
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold">{{ caseData.case_title || caseData.name }}</h2>
+            <button @click="goBack" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+                Back
+            </button>
         </div>
 
         <!-- Case Details -->
@@ -168,6 +171,10 @@ const loadTasks = async () => {
 const formatDate = (time: string): string => {
     return DateFormatter.instance.formatDate(new Date(time));
 }
+
+const goBack = () => {
+    window.history.back();
+};
 
 // Call loadTasks on mount
 onMounted(() => {
