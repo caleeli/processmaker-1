@@ -3,7 +3,8 @@
         <!-- Case Header -->
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold">{{ caseData.case_title || caseData.name }}</h2>
-            <button @click="goBack" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
+            <button @click="goBack"
+                class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300">
                 Back
             </button>
         </div>
@@ -15,20 +16,26 @@
                 <div class="flex mb-2">
                     <dt class="w-1/3 text-right font-medium">Status:</dt>
                     <dd class="w-2/3 pl-4">
-                        <span class="px-2 py-1 text-white bg-blue-600 rounded-full">{{ caseData.status }}</span>
+                        <span
+                            class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full transition-transform transform hover:scale-105"
+                            :class="getStatusClass(caseData.status)">
+                            {{ caseData.status }}
+                        </span>
                     </dd>
                 </div>
                 <div class="flex mb-2">
                     <dt class="w-1/3 text-right font-medium">Created by:</dt>
                     <dd class="w-2/3 pl-4 flex items-center">
-                        <img :src="caseData.user.avatar" :alt="caseData.user.fullname" class="w-8 h-8 rounded-full mr-2" />
+                        <img :src="caseData.user.avatar" :alt="caseData.user.fullname"
+                            class="w-8 h-8 rounded-full mr-2" />
                         {{ caseData.user.fullname }}
                     </dd>
                 </div>
                 <div class="flex mb-2">
                     <dt class="w-1/3 text-right font-medium">Process:</dt>
                     <dd class="w-2/3 pl-4">
-                        <a :href="`/process-browser/${caseData.process_id}`" target="_blank" class="text-blue-600 hover:underline">
+                        <a :href="`/process-browser/${caseData.process_id}`" target="_blank"
+                            class="text-blue-600 hover:underline">
                             {{ caseData.name }}
                         </a>
                     </dd>
@@ -85,7 +92,9 @@
                         <tbody>
                             <tr v-for="(activity, index) in tasks" :key="index">
                                 <td class="p-3 border-b">
-                                    <span class="px-2 py-1 text-white bg-blue-600 rounded-full">
+                                    <span
+                                        class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full transition-transform transform hover:scale-105"
+                                        :class="getStatusClass(activity.status)">
                                         {{ activity.status }}
                                     </span>
                                 </td>
@@ -97,8 +106,7 @@
                 </div>
                 <div v-if="activeTab === 'activity'">
                     <!-- Feed Activities -->
-                    <div v-for="(activity, index) in tasks" :key="index"
-                        class="flex items-start mb-6">
+                    <div v-for="(activity, index) in tasks" :key="index" class="flex items-start mb-6">
                         <img :src="activity.user.avatar" :alt="activity.user.fullname"
                             class="w-10 h-10 rounded-full mr-4">
                         <div class="flex-1">
@@ -182,6 +190,20 @@ const goBack = () => {
         window.location.href = '/cases';
     }
 };
+
+const getStatusClass = (status: string): string => {
+    switch (status) {
+        case 'ACTIVE':
+            return 'bg-green-100 text-green-800';
+        case 'COMPLETED':
+            return 'bg-blue-100 text-blue-800';
+        case 'CANCELLED':
+            return 'bg-red-100 text-red-800';
+        default:
+            return 'bg-gray-100 text-gray-800';
+    }
+};
+
 
 // Call loadTasks on mount
 onMounted(() => {
