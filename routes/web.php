@@ -159,6 +159,8 @@ Route::middleware('auth', 'session_kill', 'sanitize', 'force_change_password', '
         ->name('tasks.index')
         ->middleware('no-cache');
     Route::get('tasks/{task}/edit', [TaskController::class, 'edit'])->name('tasks.edit');
+    Route::get('tasks/{task}/open', [TaskController::class, 'open'])->name('tasks.open');
+    Route::get('open_task/{task}', [TaskController::class, 'openTask'])->name('tasks.openTask');
     Route::get('tasks/{task}/edit/quickfill', [TaskController::class, 'quickFillEdit'])->name('tasks.edit.quickfill');
     Route::get('tasks/{task}/edit/{preview}', [TaskController::class, 'edit'])->name('tasks.preview');
 

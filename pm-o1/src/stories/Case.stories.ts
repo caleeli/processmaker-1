@@ -19,7 +19,7 @@ const meta = {
         mockData: [
             // Mock API response if needed
             {
-                url: '/api/1.1/tasks?page=1&process_request_id=undefined&per_page=15&order_by=id&order_direction=desc',
+                url: '/api/1.1/tasks?page=1&process_request_id=undefined&per_page=15&order_by=id&order_direction=desc&include=user',
                 method: 'GET',
                 status: 200,
                 response: {

@@ -39,6 +39,8 @@ class TaskController extends Controller
         'overdue' => 'Due',
     ];
 
+    private $minimal = false;
+
     public function index()
     {
         $title = 'To Do Tasks';
@@ -153,8 +155,20 @@ class TaskController extends Controller
                 'currentUser' => $currentUser,
                 'screenFields' => $screenFields,
                 'taskDraftsEnabled' => $taskDraftsEnabled,
+                'minimal' => $this->minimal,
             ]);
         }
+    }
+
+    public function open(ProcessRequestToken $task, string $preview = '')
+    {
+        $this->minimal = true;
+        return $this->edit($task, $preview);
+    }
+
+    public function openTask($taskId)
+    {
+        return view('tasks.openTask', ['taskId' => $taskId, 'currentUser' => Auth::user()]);
     }
 
     public function quickFillEdit(ProcessRequestToken $task)

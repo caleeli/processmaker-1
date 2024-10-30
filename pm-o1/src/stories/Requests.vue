@@ -1,20 +1,9 @@
 <template>
     <div class="bg-white w-full flex flex-col h-full overflow-auto" :class="{ 'p-6': !smallWidth }">
         <div class="flex space-x-6 mb-4 justify-center">
-            <counter-card
-                color="primary"
-                :count="totalRequests"
-                icon="chart-line"
-                title="My Requests"
-                link="/requests"
-            ></counter-card>
-            <counter-card
-                color="light"
-                count="101"
-                title="My Tasks"
-                icon="tasks"
-                link="/tasks"
-            ></counter-card>
+            <counter-card color="primary" :count="totalRequests" icon="chart-line" title="My Requests"
+                link="/requests" />
+            <counter-card color="light" count="101" title="My Tasks" icon="tasks" link="/tasks" />
         </div>
         <SpinnerOverlay :isLoading="loading" class="flex-1">
             <div class="overflow-auto">
@@ -43,7 +32,11 @@
                                 <template v-else-if="field.key === 'active_tasks'">
                                     <div class="line-clamp-2">
                                         <div v-for="task in getLimitedTasks(request.active_tasks)" :key="task.id">
-                                            <span>{{ task.element_name }}</span>
+                                            <a v-if="task.status === 'ACTIVE'" :href="`/open_task/${task.id}`"
+                                                class="text-blue-600 hover:underline">
+                                                {{ task.element_name }}
+                                            </a>
+                                            <span v-else>{{ task.element_name }}</span>
                                         </div>
                                     </div>
                                 </template>

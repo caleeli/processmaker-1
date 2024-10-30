@@ -98,7 +98,13 @@
                                         {{ activity.status }}
                                     </span>
                                 </td>
-                                <td class="p-3 border-b">{{ activity.element_name }}</td>
+                                <td class="p-3 border-b">
+                                    <a v-if="activity.status === 'ACTIVE'" :href="`/open_task/${activity.id}`"
+                                        class="text-blue-600 hover:underline">
+                                        {{ activity.element_name }}
+                                    </a>
+                                    <span v-else>{{ activity.element_name }}</span>
+                                </td>
                                 <td class="p-3 border-b hidden md:table-cell">{{ formatDate(activity.due_at) }}</td>
                             </tr>
                         </tbody>
@@ -115,7 +121,7 @@
                                     <strong>{{ activity.user.fullname }}</strong> {{ activity.element_name }}<br>
                                     <small class="text-gray-500">{{ activity.created_at }}</small>
                                 </div>
-                                <small class="text-gray-500">{{ activity.timeAgo }}</small>
+                                <small class="text-gray-500">{{ formatAgo(activity.created_at) }}</small>
                             </div>
                             <div v-if="activity.status" class="mt-2 p-3 bg-gray-100 rounded">
                                 {{ activity.status }}
@@ -138,6 +144,7 @@ interface Participant {
 }
 
 interface Activity {
+    id: number;
     status: string;
     element_name: string;
     created_at: string;
@@ -180,6 +187,13 @@ const formatDate = (time: string): string => {
         return '';
     }
     return DateFormatter.instance.formatDate(new Date(time));
+}
+
+const formatAgo = (time: string): string => {
+    if (!time) {
+        return '';
+    }
+    return DateFormatter.instance.timeAgo(new Date(time));
 }
 
 const goBack = () => {

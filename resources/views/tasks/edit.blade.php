@@ -1,4 +1,4 @@
-@extends('layouts.layout')
+@extends($minimal ? 'layouts.mobile' : 'layouts.layout')
 
 @section('meta')
     <meta name="request-id" content="{{ $task->processRequest->id }}">
