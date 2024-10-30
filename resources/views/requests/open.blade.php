@@ -5,8 +5,8 @@
 @endsection
 
 @section('content')
-@vite('resources/requests/Requests.js')
-<x-common.layout :user="$currentUser">
-    <x-cases.case :case-data="$request"></x-cases.case>
+@vite('resources/case.js')
+<x-common.layout :user="$currentUser" :data="['request' => $request]">
+    <case :case-data="data.request"></case>
 </x-common.layout>
 @endsection

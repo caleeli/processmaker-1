@@ -14,6 +14,7 @@
             return {
                 user: @json($user),
                 menu: @json($items),
+                data: @json($data),
             }
         },
     });

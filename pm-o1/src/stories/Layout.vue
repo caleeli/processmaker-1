@@ -2,7 +2,7 @@
   <div class="all">
     <my-header :user="user" @logo="toggleSidebar" />
 
-    <main class="flex flex-row flex-1">
+    <main class="flex flex-row flex-1 overflow-hidden">
       <Sidebar :value="sidebar" :menu="menu" @input="setSide" />
       <section class="flex-1 flex flex-col overflow-hidden">
         <slot />

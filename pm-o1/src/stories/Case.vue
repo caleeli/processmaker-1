@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white p-6 rounded-lg shadow">
+    <div class="bg-white p-6 rounded-lg shadow overflow-y-scroll">
         <!-- Case Header -->
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold">{{ caseData.case_title || caseData.name }}</h2>
@@ -22,7 +22,7 @@
                 <div class="flex mb-2">
                     <dt class="w-1/3 text-right font-medium">Process:</dt>
                     <dd class="w-2/3 pl-4">
-                        <a :href="`/process-browser/${caseData.process_id}`" class="text-blue-600 hover:underline">{{
+                        <a :href="`/process-browser/${caseData.process_id}`" target="_blank" class="text-blue-600 hover:underline">{{
                             caseData.name }}</a>
                     </dd>
                 </div>
@@ -35,11 +35,11 @@
             <div>
                 <div class="flex mb-2">
                     <dt class="w-1/3 text-right font-medium">Last Updated:</dt>
-                    <dd class="w-2/3 pl-4">{{ caseData.updated_at }}</dd>
+                    <dd class="w-2/3 pl-4">{{ formatDate(caseData.updated_at) }}</dd>
                 </div>
                 <div class="flex mb-2">
                     <dt class="w-1/3 text-right font-medium">Created:</dt>
-                    <dd class="w-2/3 pl-4">{{ caseData.created_at }}</dd>
+                    <dd class="w-2/3 pl-4">{{ formatDate(caseData.created_at) }}</dd>
                 </div>
                 <div class="flex mb-2">
                     <dt class="w-1/3 text-right font-medium">Participants:</dt>
@@ -76,8 +76,8 @@
                             <tr>
                                 <th class="p-3 font-medium text-gray-700 border-b">Status</th>
                                 <th class="p-3 font-medium text-gray-700 border-b">Title</th>
-                                <th class="p-3 font-medium text-gray-700 border-b">Start Time</th>
-                                <th class="p-3 font-medium text-gray-700 border-b">Completed Time</th>
+                                <th class="p-3 font-medium text-gray-700 border-b hidden md:table-cell">Start Time</th>
+                                <th class="p-3 font-medium text-gray-700 border-b hidden md:table-cell">Completed Time</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -88,8 +88,8 @@
                                     </span>
                                 </td>
                                 <td class="p-3 border-b">{{ activity.element_name }}</td>
-                                <td class="p-3 border-b">{{ activity.created_at }}</td>
-                                <td class="p-3 border-b">{{ activity.completed_at }}</td>
+                                <td class="p-3 border-b hidden md:table-cell">{{ formatDate(activity.created_at) }}</td>
+                                <td class="p-3 border-b hidden md:table-cell">{{ formatDate(activity.completed_at) }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -120,7 +120,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineProps } from 'vue';
+import { ref, defineProps, onMounted } from 'vue';
+import DateFormatter from './DateFormatter.ts';
 
 interface Participant {
     fullname: string;
@@ -129,10 +130,10 @@ interface Participant {
 
 interface Activity {
     status: string;
-    title: string;
-    startTime: string;
-    endTime: string;
-    comments: string;
+    element_name: string;
+    created_at: string;
+    completed_at: string;
+    user: Participant;
 }
 
 interface CaseData {
@@ -161,11 +162,17 @@ const tabClass = (tabName: string) =>
 // Load task function
 const loadTasks = async () => {
     const response = await window.ProcessMaker.apiClient.get(`tasks?page=1&process_request_id=${props.caseData.id}&per_page=15&order_by=id&order_direction=desc`);
-    tasks.value.splice(0, tasks.value.length, ...response.data.data);
+    tasks.value = response.data.data;
 };
 
+const formatDate = (time: string): string => {
+    return DateFormatter.instance.formatDate(new Date(time));
+}
+
 // Call loadTasks on mount
-loadTasks();
+onMounted(() => {
+    loadTasks();
+});
 </script>
 
 <style scoped>
