@@ -20,7 +20,8 @@ Route::prefix('api/1.1')
 
             // Route to show the screen of a task
             Route::get('/{taskId}/screen', [TaskController::class, 'showScreen'])
-                ->name('show.screen');
+                ->name('show.screen')
+                ->middleware('etag:screen_versions');
 
             // Route to show the interstitial screen of a task
             Route::get('/{taskId}/interstitial', [TaskController::class, 'showInterstitial'])

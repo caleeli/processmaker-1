@@ -138,14 +138,7 @@ class TaskController extends Controller
             ScreenCompiledManager::storeCompiledContent($key, $translatedScreen);
         }
 
-        $response = response($translatedScreen, 200);
-        $now = time();
-        // screen cache time
-        $cacheTime = config('screen_task_cache_time', 86400);
-        $response->headers->set('Cache-Control', 'max-age=' . $cacheTime . ', must-revalidate, public');
-        $response->headers->set('Expires', gmdate('D, d M Y H:i:s', $now + $cacheTime) . ' GMT');
-
-        return $response;
+        return response($translatedScreen, 200);
     }
 
     public function showInterstitial($taskId)
