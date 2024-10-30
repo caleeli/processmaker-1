@@ -143,7 +143,7 @@ class TaskController extends Controller
                 'datetime_format',
             ]);
 
-            return view('tasks.edit', [
+            return view($this->minimal ? 'tasks.open' : 'tasks.edit', [
                 'task' => $task,
                 'dueLabels' => self::$dueLabels,
                 'manager' => $manager,
@@ -155,7 +155,6 @@ class TaskController extends Controller
                 'currentUser' => $currentUser,
                 'screenFields' => $screenFields,
                 'taskDraftsEnabled' => $taskDraftsEnabled,
-                'minimal' => $this->minimal,
             ]);
         }
     }

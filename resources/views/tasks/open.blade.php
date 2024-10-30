@@ -1,4 +1,4 @@
-@extends('layouts.layout')
+@extends('layouts.task')
 
 @section('meta')
     <meta name="request-id" content="{{ $task->processRequest->id }}">
@@ -8,24 +8,6 @@
     {{__('Edit Task')}}
 @endsection
 
-@section('sidebar')
-    @include('layouts.sidebar', ['sidebar'=> Menu::get('sidebar_task')])
-@endsection
-
-@section('breadcrumbs')
-    @include('shared.breadcrumbs', ['routes' => [
-        __('Tasks') => route('tasks.index'),
-        function() use ($task) {
-            if ($task->advanceStatus == 'completed') {
-                return ['Completed Tasks', route('tasks.index', ['status' => 'CLOSED'])];
-            }
-            return ['To Do Tasks', route('tasks.index')];
-        },
-        $task->processRequest->name =>
-            Auth::user()->can('view', $task->processRequest) ? route('requests.show', ['request' => $task->processRequest->id]) : null,
-        '@{{taskTitle}}' => null,
-      ], 'attributes' => 'v-cloak'])
-@endsection
 @section('content')
     <div v-cloak id="task" class="container-fluid px-3">
         <div class="d-flex flex-column flex-md-row">
