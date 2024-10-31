@@ -138,8 +138,11 @@ export default {
             totalPages: 1,
             loading: false,
             showDropdown: false,
-            processes: [
-            ],
+            processes: [],
+            autoRefresh: {
+                time: 500,
+                times: 4,
+            },
         };
     },
     computed: {
@@ -222,18 +225,27 @@ export default {
                         this.totalPages = data.meta.last_page;
                         this.totalRequests = data.meta.total;
                         localStorage.setItem('totalRequests', this.totalRequests);
+                        this.autoRefresh.times = 3;
+                        this.autoRefresh.time = 1000;
                     }
-                    // Find if there are any active scriptTask
-                    const foundScriptTask = this.requests.find((request) => {
-                        return request.active_tasks.find((task) => {
-                            return task.element_type === 'scriptTask';
+                    if (this.autoRefresh.times > 0) {
+                        this.autoRefresh.times--;
+                        // Find if there are any active scriptTask
+                        const foundScriptTask = this.requests.find((request) => {
+                            if (!request.active_tasks.length) {
+                                return true;
+                            }
+                            return request.active_tasks.find((task) => {
+                                return task.element_type === 'scriptTask';
+                            });
                         });
-                    });
-                    if (foundScriptTask) {
-                        // Fetch the tasks again after 1 second
-                        setTimeout(() => {
-                            this.fetchRequests(false);
-                        }, 1000);
+                        if (foundScriptTask) {
+                            // Fetch the tasks again after 1 second
+                            setTimeout(() => {
+                                this.fetchRequests(false);
+                            }, this.autoRefresh.time);
+                            this.autoRefresh.time *= 2;
+                        }
                     }
                 }).finally(() => {
                     this.loading = false;
