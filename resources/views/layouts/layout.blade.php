@@ -101,7 +101,7 @@
 <div class="d-flex w-100 mw-100 h-100 mh-100" id="app-container">
   @if (shouldShow('leftSideBar'))
   <div id="sidebar" class="d-print-none" :class="{expanded: expanded}">
-      @yield('sidebar')
+      @include('components.sidebar', ['sidebar' => $sidebar])
   </div>
   @else
   <div id="sidebar" class="d-none invisible">
@@ -109,7 +109,7 @@
   @endif
   <div class="d-flex flex-grow-1 flex-column overflow-hidden">
     <div class="flex-grow-1">
-        @include('layouts.navbar')
+        @include('components.header')
     </div>
     <div class="flex-grow-1 d-flex flex-column overflow-hidden h-100" id="mainbody">
       <div id="main" class="main flex-grow-1 h-100 overflow-auto {{$content_margin ?? 'py-3'}}">
