@@ -210,7 +210,7 @@ export default {
         },
         fetchRequests() {
             this.loading = true;
-            window.ProcessMaker.apiClient.get(`requests?include=process,participants,activeTasks&page=${this.currentPage}&per_page=${this.pageSize}&order_by=id&order_direction=desc`)
+            window.ProcessMaker.apiClient.get(`requests?include=process,participants,activeTasks&page=${this.currentPage}&per_page=${this.pageSize}&type=in_progress&order_by=id&order_direction=desc`)
                 .then(({ data }) => {
                     this.requests = data.data;
                     this.totalPages = data.meta.last_page;
