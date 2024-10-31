@@ -156,4 +156,14 @@ class TaskController extends Controller
 
         return $response;
     }
+
+    public function count()
+    {
+        $count = ProcessRequestToken::select('id')
+            ->where('element_type', 'task')
+            ->where('user_id', Auth::id())
+            ->where('status', 'ACTIVE')
+            ->count();
+        return ['count' => $count];
+    }
 }

@@ -277,7 +277,7 @@ window.ProcessMaker.apiClient.defaults.timeout = apiTimeout;
 // Default alert functionality
 window.ProcessMaker.alert = function (text, variant) {
   if (typeof text === "string") {
-    window.alert(text);
+    console.log(`[${variant}] ${text}`);
   }
 };
 

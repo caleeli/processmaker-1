@@ -4,11 +4,28 @@
             <counter-card color="primary" :count="totalRequests" icon="chart-line" title="My Requests"
                 link="/requests" />
             <counter-card color="light" :count="totalTasks" title="My Tasks" icon="tasks" link="/tasks" />
-            <div class="flex flex-1 border-0 justify-end">
-                <button class="px-8 rounded bg-green-500 text-white hover:bg-green-600 transition-all duration-300 ease-in-out h-12">
+            <div class="flex flex-1 border-0 justify-end relative">
+                <button @click="toggleDropdown"
+                    class="px-8 rounded bg-green-500 text-white hover:bg-green-600 transition-all duration-300 ease-in-out h-12">
                     <i class="fas fa-plus"></i>
                     CASE
                 </button>
+                <transition name="dropdown-slide" mode="out-in">
+                    <div v-if="showDropdown"
+                        class="absolute left-0 w-full mt-2 bg-white border border-gray-300 rounded-lg shadow-lg transform transition-transform duration-300 ease-out translate-y-11 z-30"
+                        @click.outside="showDropdown = false">
+                        <ul>
+                            <li v-for="action in processes" :key="action.name" @click="startAction(action)"
+                                class="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer transition duration-200 ease-in-out">
+                                <i :class="action.icon" class="mr-3 text-gray-600"></i>
+                                <div>
+                                    <div>{{ action.name }}</div>
+                                    <div class="text-sm text-gray-500 line-clamp-2">{{ action.description }}</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </transition>
             </div>
         </div>
         <SpinnerOverlay :isLoading="loading" class="flex-1">
@@ -116,6 +133,9 @@ export default {
             currentPage: 1,
             totalPages: 1,
             loading: false,
+            showDropdown: false,
+            processes: [
+            ],
         };
     },
     computed: {
@@ -152,6 +172,18 @@ export default {
         },
     },
     methods: {
+        toggleDropdown() {
+            this.showDropdown = !this.showDropdown;
+        },
+        startAction(action) {
+            this.showDropdown = false;
+            // POST to process_events/{process}?event=start
+            window.ProcessMaker.apiClient.post(`process_events/${action.id}?event=${action.startEvents[0].id}`)
+                .then(({ data }) => {
+                    // open_request/{data.request_id}
+                    window.location.href = `/open_request/${data.id}`;
+                });
+        },
         changePage(page) {
             if (page >= 1 && page <= this.totalPages) {
                 this.currentPage = page;
@@ -178,7 +210,7 @@ export default {
         },
         fetchRequests() {
             this.loading = true;
-            window.ProcessMaker.apiClient.get(`requests?include=process,participants,activeTasks&page=${this.currentPage}&per_page=${this.pageSize}`)
+            window.ProcessMaker.apiClient.get(`requests?include=process,participants,activeTasks&page=${this.currentPage}&per_page=${this.pageSize}&order_by=id&order_direction=desc`)
                 .then(({ data }) => {
                     this.requests = data.data;
                     this.totalPages = data.meta.last_page;
@@ -195,6 +227,16 @@ export default {
                     localStorage.setItem('totalTasks', this.totalTasks);
                 });
         },
+        fetchProcesses() {
+            window.ProcessMaker.apiClient.get('start_processes')
+                .then(({ data }) => {
+                    this.processes = data.data;
+                    // Add random icons to processes
+                    this.processes.forEach((process) => {
+                        process.icon = ['fas fa-briefcase', 'fas fa-clipboard', 'fas fa-cogs', 'fas fa-cube', 'fas fa-database', 'fas fa-drafting-compass', 'fas fa-file-alt', 'fas fa-file-code', 'fas fa-file-contract', 'fas fa-file-invoice', 'fas fa-file-signature', 'fas fa-folder', 'fas fa-folder-open', 'fas fa-globe', 'fas fa-hammer', 'fas fa-handshake', 'fas fa-hard-hat', 'fas fa-industry', 'fas fa-laptop-code', 'fas fa-lightbulb', 'fas fa-lock', 'fas fa-map-marked-alt', 'fas fa-map-signs', 'fas fa-money-bill-alt', 'fas fa-paint-roller', 'fas fa-pen', 'fas fa-pen-alt', 'fas fa-pen-fancy', 'fas fa-pen-nib', 'fas fa-pen-square', 'fas fa-pen-square', 'fas fa-puzzle-piece', 'fas fa-rocket', 'fas fa-screwdriver', 'fas fa-shield-alt', 'fas fa-sign', 'fas fa-signature', 'fas fa-sitemap', 'fas fa-tasks', 'fas fa-thumbs-up', 'fas fa-tools', 'fas fa-truck', 'fas fa-user-tie', 'fas fa-wrench'][Math.floor(Math.random() * 45)];
+                    });
+                });
+        },
         updateScreenHeight() {
             this.screenHeight = window.innerHeight;
         },
@@ -204,6 +246,7 @@ export default {
         this.updateScreenHeight();
         this.fetchRequests();
         this.fetchTaskCount();
+        this.fetchProcesses();
     },
     beforeDestroy() {
         window.removeEventListener('resize', this.updateScreenHeight);
@@ -241,6 +284,17 @@ export default {
 .avatar-fade-leave-to {
     opacity: 0;
     transform: scale(0.9);
+}
+
+.dropdown-slide-enter-active,
+.dropdown-slide-leave-active {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.dropdown-slide-enter,
+.dropdown-slide-leave-to {
+    transform: translateY(-20px);
+    opacity: 0;
 }
 
 .line-clamp-2 {

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('head')
-<title>@yield('title', 'Requests')</title>
+<title>@yield('title', 'Cases')</title>
 @endsection
 
 @section('content')
