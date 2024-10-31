@@ -55,10 +55,14 @@
                                 <template v-else-if="field.key === 'active_tasks'">
                                     <div class="line-clamp-2">
                                         <div v-for="task in getLimitedTasks(request.active_tasks)" :key="task.id">
-                                            <a v-if="task.status === 'ACTIVE'" :href="`/open_task/${task.id}`"
+                                            <a v-if="task.status === 'ACTIVE' && task.element_type === 'task'" :href="`/open_task/${task.id}`"
                                                 class="text-blue-600 hover:underline">
                                                 {{ task.element_name }}
                                             </a>
+                                            <span v-else-if="task.status === 'ACTIVE'">
+                                                <i class="fas fa-spinner fa-spin mr-2"></i>
+                                                {{ task.element_name }}
+                                            </span>
                                             <span v-else>{{ task.element_name }}</span>
                                         </div>
                                     </div>
@@ -208,14 +212,29 @@ export default {
                     return 'bg-gray-100 text-gray-800';
             }
         },
-        fetchRequests() {
-            this.loading = true;
-            window.ProcessMaker.apiClient.get(`requests?include=process,participants,activeTasks&page=${this.currentPage}&per_page=${this.pageSize}&type=in_progress&order_by=id&order_direction=desc`)
+        fetchRequests(showLoading = true) {
+            this.loading = showLoading;
+            window.ProcessMaker.apiClient.get(`requests?include=process,participants,activeTasks2&page=${this.currentPage}&per_page=${this.pageSize}&type=in_progress&order_by=id&order_direction=desc`)
                 .then(({ data }) => {
-                    this.requests = data.data;
-                    this.totalPages = data.meta.last_page;
-                    this.totalRequests = data.meta.total;
-                    localStorage.setItem('totalRequests', this.totalRequests);
+                    // check if data.data is equal to this.requests
+                    if (JSON.stringify(data.data) !== JSON.stringify(this.requests)) {
+                        this.requests = data.data;
+                        this.totalPages = data.meta.last_page;
+                        this.totalRequests = data.meta.total;
+                        localStorage.setItem('totalRequests', this.totalRequests);
+                    }
+                    // Find if there are any active scriptTask
+                    const foundScriptTask = this.requests.find((request) => {
+                        return request.active_tasks.find((task) => {
+                            return task.element_type === 'scriptTask';
+                        });
+                    });
+                    if (foundScriptTask) {
+                        // Fetch the tasks again after 1 second
+                        setTimeout(() => {
+                            this.fetchRequests(false);
+                        }, 1000);
+                    }
                 }).finally(() => {
                     this.loading = false;
                 });

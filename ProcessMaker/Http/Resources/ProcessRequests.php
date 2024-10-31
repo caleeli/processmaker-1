@@ -28,6 +28,13 @@ class ProcessRequests extends ApiResource
                 ->where('element_type', 'task')
                 ->get();
         }
+        if (in_array('activeTasks2', $include)) {
+            $array['active_tasks'] = $this->tokens()
+                ->select(['id', 'element_name', 'status', 'user_id', 'element_type'])
+                ->where('status', 'ACTIVE')
+                ->whereIn('element_type', ['task', 'scriptTask', 'serviceTask'])
+                ->get();
+        }
         if (in_array('user', $include)) {
             $array['user'] = new Users($this->user);
         }
