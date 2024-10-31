@@ -27,5 +27,6 @@
     @viteRenderScriptAssets()
     @yield('scripts')
     @stack('scripts')
+    @include('shared.preload')
 </body>
 </html>
