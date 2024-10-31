@@ -15,8 +15,10 @@ class ETagMiddleware
             return $next($request);
         }
 
+        // Initial token is XSS protection: Required for web pages
+        // so it has the latest csrf-token to use the api endpoints
+        $etag = csrf_token();
         // Concatenate all table tags
-        $etag = Auth::id() ?: '';
         foreach ($tableNames as $tableName) {
             // Get the ETAG version of the cache
             $cacheKey = "etag_version_{$tableName}";
