@@ -3,7 +3,13 @@
         <div class="flex space-x-6 mb-4 justify-center">
             <counter-card color="primary" :count="totalRequests" icon="chart-line" title="My Requests"
                 link="/requests" />
-            <counter-card color="light" count="101" title="My Tasks" icon="tasks" link="/tasks" />
+            <counter-card color="light" :count="totalTasks" title="My Tasks" icon="tasks" link="/tasks" />
+            <div class="flex flex-1 border-0 justify-end">
+                <button class="px-8 rounded bg-green-500 text-white hover:bg-green-600 transition-all duration-300 ease-in-out h-12">
+                    <i class="fas fa-plus"></i>
+                    CASE
+                </button>
+            </div>
         </div>
         <SpinnerOverlay :isLoading="loading" class="flex-1">
             <div class="overflow-auto">
@@ -103,7 +109,8 @@ export default {
     mixins: [UpdateScreenSize],
     data() {
         return {
-            totalRequests: localStorage.getItem('totalRequests') || 0,
+            totalRequests: Number(localStorage.getItem('totalRequests') || 0),
+            totalTasks: Number(localStorage.getItem('totalTasks') || 0),
             screenHeight: 0,
             requests: [],
             currentPage: 1,
@@ -181,6 +188,13 @@ export default {
                     this.loading = false;
                 });
         },
+        fetchTaskCount() {
+            window.ProcessMaker.apiClient.get('/api/1.1/tasks/count')
+                .then(({ data }) => {
+                    this.totalTasks = data.count;
+                    localStorage.setItem('totalTasks', this.totalTasks);
+                });
+        },
         updateScreenHeight() {
             this.screenHeight = window.innerHeight;
         },
@@ -189,6 +203,7 @@ export default {
         window.addEventListener('resize', this.updateScreenHeight);
         this.updateScreenHeight();
         this.fetchRequests();
+        this.fetchTaskCount();
     },
     beforeDestroy() {
         window.removeEventListener('resize', this.updateScreenHeight);
